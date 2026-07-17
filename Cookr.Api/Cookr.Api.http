@@ -1,5 +1,5 @@
 @HostAddress = http://localhost:5021
-@RecipeId = 1
+@RecipeId = 4
 
 GET {{HostAddress}}/
 Accept: application/json
@@ -23,6 +23,17 @@ Content-Type: application/json
     "instructions": "Bata os ovos, óleo e cenoura no liquidificador. Misture com o restante seco. Asse 40min a 180°C.",
     "prepTimeMinutes": 60,
     "servings": 8
+}
+
+### PUT recipe
+PUT {{HostAddress}}/recipes/{{RecipeId}}
+Content-Type: application/json
+
+{
+    "title": "Bolo de cenoura (editado)",
+    "instructions": "Bata os ovos, óleo e cenoura no liquidificador. Misture com o restante seco. Asse 40min a 180°C. Cubra com calda de chocolate.",
+    "prepTimeMinutes": 75,
+    "servings": 10
 }
 
 ### DELETE recipe

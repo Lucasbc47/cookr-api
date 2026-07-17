@@ -16,14 +16,22 @@ public static class RecipeEndpoints
         {
             var recipe = await service.GetByIdAsync(id);
             return recipe is not null
-                ? Results.Ok(recipe)
+                ? Results.Ok(recipe.ToResponse())
                 : Results.NotFound();
         });
 
         group.MapPost("/", async (CreateRecipeRequest request, IRecipeService service) =>
         {
             var created = await service.CreateAsync(request.ToEntity());
-            return Results.Created($"/recipes/{created.Id}", created);
+            return Results.Created($"/recipes/{created.Id}", created.ToResponse());
+        });
+
+        group.MapPut("/{id:int}", async (int id, UpdateRecipeRequest request, IRecipeService service) =>
+        {
+            var updated = await service.UpdateAsync(id, request);
+            return updated is not null
+                ? Results.Ok(updated.ToResponse())
+                : Results.NotFound();
         });
 
         group.MapDelete("/{id:int}", async (int id, IRecipeService service) =>
