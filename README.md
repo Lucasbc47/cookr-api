@@ -7,9 +7,31 @@ API do Cookr - .NET 8, Minimal API
 ```
 cookr-api/
   Cookr.sln
-  Cookr.Api/       -> Web API (Minimal API + Serilog)
-  Cookr.Domain/    -> Class library (entidades)
+  Cookr.Api/            -> Web API (Minimal API + Serilog)
+  Cookr.Domain/         -> Class library (entidades)
+  Cookr.Infrastructure/ -> EF Core + SQLite (DbContext, migrations)
 ```
+
+## Padrão de feature (Features/<Nome>/)
+
+```
+Features/Recipes/
+  RecipeEndpoints.cs   -> rotas (MapGroup)
+  RecipeService.cs     -> interface + service (Scoped, injeta DbContext direto, sem repository)
+  RecipeModels.cs      -> records de request/response
+  RecipeMappings.cs    -> ToEntity() / ToSummary()
+```
+
+Endpoint nunca devolve entidade crua, sempre DTO. Registrar service novo no Program.cs: `AddScoped<IXxxService, XxxService>()`.
+
+## Migrations (EF Core + SQLite)
+
+```
+dotnet ef migrations add NomeDaMigration --project Cookr.Infrastructure --startup-project Cookr.Api
+dotnet ef database update --project Cookr.Infrastructure --startup-project Cookr.Api
+```
+
+Banco: `cookr.db` (ignorado no git). Connection string no appsettings.json.
 
 ## Solution (.sln)
 
