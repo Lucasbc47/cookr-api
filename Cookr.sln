@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookr.Api", "Cookr.Api\Cookr.Api.csproj", "{F03BD2CC-5CB5-4F7C-B4DF-B2C156631F3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookr.Domain", "Cookr.Domain\Cookr.Domain.csproj", "{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F03BD2CC-5CB5-4F7C-B4DF-B2C156631F3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F03BD2CC-5CB5-4F7C-B4DF-B2C156631F3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F03BD2CC-5CB5-4F7C-B4DF-B2C156631F3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F03BD2CC-5CB5-4F7C-B4DF-B2C156631F3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
