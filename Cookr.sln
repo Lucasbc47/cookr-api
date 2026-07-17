@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookr.Api", "Cookr.Api\Cook
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookr.Domain", "Cookr.Domain\Cookr.Domain.csproj", "{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cookr.Infrastructure", "Cookr.Infrastructure\Cookr.Infrastructure.csproj", "{807393A9-2C6B-4DF3-9A32-38E75C7ED771}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BA25FA0-3AE7-4352-ACA3-3FE44E24DF42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{807393A9-2C6B-4DF3-9A32-38E75C7ED771}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{807393A9-2C6B-4DF3-9A32-38E75C7ED771}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{807393A9-2C6B-4DF3-9A32-38E75C7ED771}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{807393A9-2C6B-4DF3-9A32-38E75C7ED771}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
