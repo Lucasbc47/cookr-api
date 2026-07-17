@@ -25,6 +25,8 @@ dotnet build Cookr.sln
 ```
 dotnet new webapi -n Cookr.Api -o Cookr.Api
 dotnet new webapi -n Cookr.Api -o Cookr.Api -controllers
+dotnet new classlib -n Cookr.Domain -o Cookr.Domain
+dotnet sln add Cookr.Domain/Cookr.Domain.csproj
 ```
 
 ## Referência entre projetos
