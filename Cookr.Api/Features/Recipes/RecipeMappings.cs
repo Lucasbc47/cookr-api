@@ -22,6 +22,23 @@ public static class RecipeMappings
 
     public static RecipeSummary ToSummary(this Recipe recipe) => new(recipe.Id, recipe.Title);
 
+    public static RecipeIngredient ToEntity(this AddRecipeIngredientRequest request, int recipeId) => new()
+    {
+        RecipeId = recipeId,
+        IngredientId = request.IngredientId,
+        Quantity = request.Quantity,
+        Unit = request.Unit
+    };
+    public static RecipeIngredientResponse ToResponse(this RecipeIngredient ri) =>
+        new(ri.IngredientId, ri.Ingredient.Name, ri.Quantity, ri.Unit);
+
     public static RecipeResponse ToResponse(this Recipe recipe) =>
-        new(recipe.Id, recipe.Title, recipe.Instructions, recipe.PrepTimeMinutes, recipe.Servings);
+        new(
+            recipe.Id,
+            recipe.Title,
+            recipe.Instructions,
+            recipe.PrepTimeMinutes,
+            recipe.Servings,
+            recipe.RecipeIngredients.Select(ri => ri.ToResponse()).ToList());
+
 }

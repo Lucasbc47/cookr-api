@@ -40,6 +40,21 @@ public static class RecipeEndpoints
             return deleted ? Results.NoContent() : Results.NotFound();
         });
 
+
+        group.MapPost("/{id:int}/ingredients", async (int id, AddRecipeIngredientRequest request, IRecipeService service) =>
+        {
+            var result = await service.AddIngredientAsync(id, request);
+
+            return result switch
+            {
+                AddIngredientResult.Success => Results.NoContent(),
+                AddIngredientResult.RecipeNotFound => Results.NotFound("Recipe not found"),
+                AddIngredientResult.IngredientNotFound => Results.NotFound("Ingredient not found"),
+                AddIngredientResult.AlreadyAdded => Results.Conflict(),
+                _ => Results.Problem()
+            };
+        });
+
         return app;
     }
 }

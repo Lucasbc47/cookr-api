@@ -1,6 +1,6 @@
 @HostAddress = http://localhost:5021
 @RecipeId = 2
-@IngredientId = 1
+@IngredientId = 2
 
 GET {{HostAddress}}/
 Accept: application/json
@@ -40,6 +40,16 @@ Content-Type: application/json
 ### DELETE recipe
 DELETE {{HostAddress}}/recipes/{{RecipeId}}
 Accept: application/json
+
+### POST ingredient na recipe
+POST {{HostAddress}}/recipes/{{RecipeId}}/ingredients
+Content-Type: application/json
+
+{
+    "ingredientId": 2,
+    "quantity": 3,
+    "unit": "un"
+}
 
 ### Ingredients
 
