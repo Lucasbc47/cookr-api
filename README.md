@@ -1,8 +1,8 @@
 # Cookr API
 
-API de receitas pessoais. Projeto de estudo em .NET 8 com Minimal API, EF Core e SQLite.
+API pra guardar minhas receitas: cada receita tem seus ingredientes, com quantidade e unidade.
 
-Cadastra receitas e ingredientes, e vincula os dois com quantidade e unidade (N:N via `RecipeIngredient`).
+Projeto de estudo em .NET 8 com Minimal API, EF Core e SQLite.
 
 ## Stack
 
