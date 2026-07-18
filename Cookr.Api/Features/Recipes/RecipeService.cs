@@ -6,7 +6,7 @@ namespace Cookr.Api.Features.Recipes;
 
 public interface IRecipeService
 {
-    Task<List<Recipe>> GetAllAsync();
+    Task<List<RecipeSummary>> GetAllAsync();
     Task<Recipe?> GetByIdAsync(int id);
     Task<Recipe> CreateAsync(Recipe recipe);
     Task<Recipe?> UpdateAsync(int id, UpdateRecipeRequest request);
@@ -14,14 +14,17 @@ public interface IRecipeService
 
     // RecipeIngredient
     Task<AddIngredientResult> AddIngredientAsync(int recipeId, AddRecipeIngredientRequest request);
+    Task<bool> RemoveIngredientAsync(int recipeId, int ingredientId);
 }
 
 public class RecipeService(CookrDbContext dbContext) : IRecipeService
 {
     private readonly CookrDbContext _dbContext = dbContext;
-    public async Task<List<Recipe>> GetAllAsync()
+    public async Task<List<RecipeSummary>> GetAllAsync()
     {
-        return await _dbContext.Recipes.ToListAsync();
+        return await _dbContext.Recipes
+            .Select(r => new RecipeSummary(r.Id, r.Title))
+            .ToListAsync();
     }
 
     public async Task<Recipe?> GetByIdAsync(int id)
@@ -67,10 +70,10 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
         var ingredient = await _dbContext.Ingredients.FindAsync(request.IngredientId);
         if (ingredient is null) return AddIngredientResult.IngredientNotFound;
 
-        var arleadyAdded = await _dbContext.RecipeIngredients
+        var alreadyAdded = await _dbContext.RecipeIngredients
             .AnyAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == request.IngredientId);
 
-        if (arleadyAdded) return AddIngredientResult.AlreadyAdded;
+        if (alreadyAdded) return AddIngredientResult.AlreadyAdded;
         var recipeIngredient = new RecipeIngredient
         {
             RecipeId = recipeId,
@@ -83,5 +86,14 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
         return AddIngredientResult.Success;
 
     }
+    public async Task<bool> RemoveIngredientAsync(int recipeId, int ingredientId)
+    {
+        var link = await _dbContext.RecipeIngredients
+            .FirstOrDefaultAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == ingredientId);
+        if (link is null) return false;
 
+        _dbContext.RecipeIngredients.Remove(link);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
 }

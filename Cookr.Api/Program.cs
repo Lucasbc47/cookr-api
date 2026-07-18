@@ -6,7 +6,6 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//  Serilog
 builder.Host.UseSerilog((context, config) =>
     config.WriteTo.Console(
         outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"));

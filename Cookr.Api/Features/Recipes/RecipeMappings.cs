@@ -20,8 +20,6 @@ public static class RecipeMappings
         recipe.Servings = request.Servings;
     }
 
-    public static RecipeSummary ToSummary(this Recipe recipe) => new(recipe.Id, recipe.Title);
-
     public static RecipeIngredient ToEntity(this AddRecipeIngredientRequest request, int recipeId) => new()
     {
         RecipeId = recipeId,

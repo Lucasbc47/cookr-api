@@ -51,6 +51,10 @@ Content-Type: application/json
     "unit": "un"
 }
 
+### DELETE ingredient da recipe
+DELETE {{HostAddress}}/recipes/{{RecipeId}}/ingredients/{{IngredientId}}
+Accept: application/json
+
 ### Ingredients
 
 ### GET ingredients

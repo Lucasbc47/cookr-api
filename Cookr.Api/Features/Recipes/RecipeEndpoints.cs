@@ -7,10 +7,7 @@ public static class RecipeEndpoints
         var group = app.MapGroup("/recipes");
 
         group.MapGet("/", async (IRecipeService service) =>
-        {
-            var recipes = await service.GetAllAsync();
-            return Results.Ok(recipes.Select(r => r.ToSummary()));
-        });
+            Results.Ok(await service.GetAllAsync()));
 
         group.MapGet("/{id:int}", async (int id, IRecipeService service) =>
         {
@@ -53,6 +50,12 @@ public static class RecipeEndpoints
                 AddIngredientResult.AlreadyAdded => Results.Conflict(),
                 _ => Results.Problem()
             };
+        });
+
+        group.MapDelete("/{id:int}/ingredients/{ingredientId:int}", async (int id, int ingredientId, IRecipeService service) =>
+        {
+            var deleted = await service.RemoveIngredientAsync(id, ingredientId);
+            return deleted ? Results.NoContent() : Results.NotFound();
         });
 
         return app;
