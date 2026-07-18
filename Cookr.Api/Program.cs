@@ -1,3 +1,4 @@
+using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
 using Cookr.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,13 @@ builder.Services.AddDbContext<CookrDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("CookrDb")));
 
 builder.Services.AddScoped<IRecipeService, RecipeService>();
+builder.Services.AddScoped<IIngredientService, IngredientService>();
 
 var app = builder.Build();
 
 app.MapGet("/", () => Results.Ok(new { message = "Cookr is running!" }));
+
 app.MapRecipeEndpoints();
+app.MapIngredientEndpoints();
 
 app.Run();
