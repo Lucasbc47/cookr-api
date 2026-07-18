@@ -29,20 +29,32 @@ dotnet ef database update --project Cookr.Infrastructure --startup-project Cookr
 
 ## Endpoints
 
+### Receitas
+
+| Método | Rota           | Faz                               |
+| ------ | -------------- | --------------------------------- |
+| GET    | /recipes       | Lista receitas (id + título)      |
+| GET    | /recipes/{id}  | Receita completa com ingredientes |
+| POST   | /recipes       | Cria receita                      |
+| PUT    | /recipes/{id}  | Atualiza receita                  |
+| DELETE | /recipes/{id}  | Remove receita                    |
+
+### Ingredientes da receita
+
 | Método | Rota                                     | Faz                                   |
 | ------ | ---------------------------------------- | ------------------------------------- |
-| GET    | /recipes                                 | Lista receitas (id + título)          |
-| GET    | /recipes/{id}                            | Receita completa com ingredientes     |
-| POST   | /recipes                                 | Cria receita                          |
-| PUT    | /recipes/{id}                            | Atualiza receita                      |
-| DELETE | /recipes/{id}                            | Remove receita                        |
 | POST   | /recipes/{id}/ingredients                | Vincula ingrediente (quantity + unit) |
 | DELETE | /recipes/{id}/ingredients/{ingredientId} | Desvincula ingrediente                |
-| GET    | /ingredients                             | Lista ingredientes                    |
-| GET    | /ingredients/{id}                        | Ingrediente por id                    |
-| POST   | /ingredients                             | Cria ingrediente                      |
-| PUT    | /ingredients/{id}                        | Atualiza ingrediente                  |
-| DELETE | /ingredients/{id}                        | Remove ingrediente                    |
+
+### Ingredientes
+
+| Método | Rota               | Faz                  |
+| ------ | ------------------ | -------------------- |
+| GET    | /ingredients       | Lista ingredientes   |
+| GET    | /ingredients/{id}  | Ingrediente por id   |
+| POST   | /ingredients       | Cria ingrediente     |
+| PUT    | /ingredients/{id}  | Atualiza ingrediente |
+| DELETE | /ingredients/{id}  | Remove ingrediente   |
 
 Exemplos de request prontos em `Cookr.Api/Cookr.Api.http`.
 
