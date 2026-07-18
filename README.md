@@ -1,75 +1,68 @@
-# Cookr.Api
+# Cookr API
 
-API do Cookr - .NET 8, Minimal API
+API de receitas pessoais. Projeto de estudo em .NET 8 com Minimal API, EF Core e SQLite.
 
-## Estrutura
+Cadastra receitas e ingredientes, e vincula os dois com quantidade e unidade (N:N via `RecipeIngredient`).
+
+## Stack
+
+- .NET 8 / Minimal API
+- EF Core 8 + SQLite
+- Serilog
+- Swagger (dev)
+
+## Rodar
+
+```
+dotnet run --project Cookr.Api
+```
+
+- API: `http://localhost:5021`
+- Swagger: `http://localhost:5021/swagger` (só em Development)
+- `GET /` responde a versão em execução
+
+Banco SQLite em `Cookr.Api/Data/cookr.db`, criado via migrations:
+
+```
+dotnet ef database update --project Cookr.Infrastructure --startup-project Cookr.Api
+```
+
+## Endpoints
+
+| Método | Rota                                     | Faz                                   |
+| ------ | ---------------------------------------- | ------------------------------------- |
+| GET    | /recipes                                 | Lista receitas (id + título)          |
+| GET    | /recipes/{id}                            | Receita completa com ingredientes     |
+| POST   | /recipes                                 | Cria receita                          |
+| PUT    | /recipes/{id}                            | Atualiza receita                      |
+| DELETE | /recipes/{id}                            | Remove receita                        |
+| POST   | /recipes/{id}/ingredients                | Vincula ingrediente (quantity + unit) |
+| DELETE | /recipes/{id}/ingredients/{ingredientId} | Desvincula ingrediente                |
+| GET    | /ingredients                             | Lista ingredientes                    |
+| GET    | /ingredients/{id}                        | Ingrediente por id                    |
+| POST   | /ingredients                             | Cria ingrediente                      |
+| PUT    | /ingredients/{id}                        | Atualiza ingrediente                  |
+| DELETE | /ingredients/{id}                        | Remove ingrediente                    |
+
+Exemplos de request prontos em `Cookr.Api/Cookr.Api.http`.
+
+## Arquitetura
 
 ```
 cookr-api/
-  Cookr.sln
-  Cookr.Api/            -> Web API (Minimal API + Serilog)
-  Cookr.Domain/         -> Class library (entidades)
-  Cookr.Infrastructure/ -> EF Core + SQLite (DbContext, migrations)
+  Cookr.Api/            -> Web API, features em vertical slice
+  Cookr.Domain/         -> entidades
+  Cookr.Infrastructure/ -> DbContext + migrations
 ```
 
-## Padrão de feature (Features/<Nome>/)
+Cada feature vive numa pasta própria com 4 arquivos:
 
 ```
 Features/Recipes/
   RecipeEndpoints.cs   -> rotas (MapGroup)
-  RecipeService.cs     -> interface + service (Scoped, injeta DbContext direto, sem repository)
+  RecipeService.cs     -> interface + service (injeta DbContext direto, sem repository)
   RecipeModels.cs      -> records de request/response
-  RecipeMappings.cs    -> ToEntity() / ToSummary()
+  RecipeMappings.cs    -> ToEntity() / ToResponse() / ApplyTo()
 ```
 
-Endpoint nunca devolve entidade crua, sempre DTO. Registrar service novo no Program.cs: `AddScoped<IXxxService, XxxService>()`.
-
-## Migrations (EF Core + SQLite)
-
-```
-dotnet ef migrations add NomeDaMigration --project Cookr.Infrastructure --startup-project Cookr.Api
-dotnet ef database update --project Cookr.Infrastructure --startup-project Cookr.Api
-```
-
-Banco: `cookr.db` (ignorado no git). Connection string no appsettings.json.
-
-## Solution (.sln)
-
-```
-dotnet new sln -n Cookr
-dotnet sln add Cookr.Api/Cookr.Api.csproj
-dotnet sln list
-dotnet build Cookr.sln
-```
-
-## Criar projetos novos
-
-```
-dotnet new webapi -n Cookr.Api -o Cookr.Api
-dotnet new webapi -n Cookr.Api -o Cookr.Api -controllers
-dotnet new classlib -n Cookr.Domain -o Cookr.Domain
-dotnet sln add Cookr.Domain/Cookr.Domain.csproj
-```
-
-## Referência entre projetos
-
-```
-dotnet add Cookr.Api/Cookr.Api.csproj reference Cookr.Domain/Cookr.Domain.csproj
-```
-
-## Pacotes (NuGet)
-
-```
-dotnet add Cookr.Api package Serilog.AspNetCore
-dotnet list Cookr.Api package
-dotnet remove Cookr.Api package [....]
-```
-
-## Rodar / buildar
-
-```
-dotnet run --project Cookr.Api
-dotnet run
-dotnet build
-dotnet watch run --project Cookr.Api
-```
+Decisões: endpoint nunca devolve entidade crua, sempre DTO. Sem camada de repository nem Application, o DbContext já faz esse papel. Abstração entra quando doer, não antes.

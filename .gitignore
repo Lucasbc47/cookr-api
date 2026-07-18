@@ -11,6 +11,9 @@
 *.db-shm
 *.db-wal
 
+# Anotações pessoais
+docs/
+
 # User-specific files
 *.rsuser
 *.suo
