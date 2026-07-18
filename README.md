@@ -77,4 +77,4 @@ Features/Recipes/
   RecipeMappings.cs    -> ToEntity() / ToResponse() / ApplyTo()
 ```
 
-Decisões: endpoint nunca devolve entidade crua, sempre DTO. Sem camada de repository nem Application, o DbContext já faz esse papel. Abstração entra quando doer, não antes.
+Endpoint nunca devolve entidade crua, sempre DTO. Sem camada de repository nem Application.
