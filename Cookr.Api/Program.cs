@@ -1,14 +1,17 @@
+using Microsoft.EntityFrameworkCore;
 using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
 using Cookr.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, config) =>
-    config.WriteTo.Console(
-        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"));
+    config
+        .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+        .WriteTo.Console(
+            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"));
 
 builder.Services.AddDbContext<CookrDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("CookrDb")));
@@ -20,6 +23,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.GetLevel = (ctx, _, ex) =>
+        ex is not null || ctx.Response.StatusCode >= 500 ? LogEventLevel.Error
+        : ctx.Request.Path.StartsWithSegments("/swagger") ? LogEventLevel.Verbose
+        : LogEventLevel.Information;
+});
 
 if (app.Environment.IsDevelopment())
 {
