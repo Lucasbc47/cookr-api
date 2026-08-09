@@ -1,4 +1,6 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Cookr.Api;
 using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
 using Cookr.Infrastructure;
@@ -18,6 +20,7 @@ builder.Services.AddDbContext<CookrDbContext>(options =>
 
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -30,8 +30,10 @@ public static class IngredientEndpoints
             var created = await service.CreateAsync(request.ToEntity());
             return Results.Created($"/ingredients/{created.Id}", created.ToResponse());
         })
+            .AddEndpointFilter<ValidationFilter<CreateIngredientRequest>>()
             .WithSummary("Cria ingrediente")
-            .Produces<IngredientResponse>(StatusCodes.Status201Created);
+            .Produces<IngredientResponse>(StatusCodes.Status201Created)
+            .ProducesValidationProblem();
 
         group.MapPut("/{id:int}", async (int id, UpdateIngredientRequest request, IIngredientService service) =>
         {
@@ -40,9 +42,11 @@ public static class IngredientEndpoints
                 ? Results.Ok(updated.ToResponse())
                 : Results.NotFound();
         })
+            .AddEndpointFilter<ValidationFilter<UpdateIngredientRequest>>()
             .WithSummary("Atualiza ingrediente")
             .Produces<IngredientResponse>()
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem();
 
         group.MapDelete("/{id:int}", async (int id, IIngredientService service) =>
         {
