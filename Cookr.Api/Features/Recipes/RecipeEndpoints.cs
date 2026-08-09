@@ -27,8 +27,10 @@ public static class RecipeEndpoints
             var created = await service.CreateAsync(request.ToEntity());
             return Results.Created($"/recipes/{created.Id}", created.ToResponse());
         })
+            .AddEndpointFilter<ValidationFilter<CreateRecipeRequest>>()
             .WithSummary("Cria receita")
-            .Produces<RecipeResponse>(StatusCodes.Status201Created);
+            .Produces<RecipeResponse>(StatusCodes.Status201Created)
+            .ProducesValidationProblem();
 
         group.MapPut("/{id:int}", async (int id, UpdateRecipeRequest request, IRecipeService service) =>
         {
@@ -37,9 +39,11 @@ public static class RecipeEndpoints
                 ? Results.Ok(updated.ToResponse())
                 : Results.NotFound();
         })
+            .AddEndpointFilter<ValidationFilter<UpdateRecipeRequest>>()
             .WithSummary("Atualiza receita")
             .Produces<RecipeResponse>()
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem();
 
         group.MapDelete("/{id:int}", async (int id, IRecipeService service) =>
         {
@@ -63,10 +67,12 @@ public static class RecipeEndpoints
                 _ => Results.Problem()
             };
         })
+            .AddEndpointFilter<ValidationFilter<AddRecipeIngredientRequest>>()
             .WithSummary("Vincula ingrediente à receita (quantity + unit)")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status409Conflict);
+            .Produces(StatusCodes.Status409Conflict)
+            .ProducesValidationProblem();
 
         group.MapDelete("/{id:int}/ingredients/{ingredientId:int}", async (int id, int ingredientId, IRecipeService service) =>
         {
