@@ -44,7 +44,7 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
 
     public async Task<Recipe?> UpdateAsync(int id, UpdateRecipeRequest request)
     {
-        var recipe = await _dbContext.Recipes.FindAsync(id);
+        var recipe = await GetByIdAsync(id);
         if (recipe is null) return null;
 
         request.ApplyTo(recipe);
