@@ -46,7 +46,8 @@ Cookr.Api.Tests/       testes de domínio, validação e integração
 
 ## Endpoints
 
-Exemplo `GET /recipes/1`:
+<details>
+<summary><b>Exemplo: <code>GET /recipes/1</code></b></summary>
 
 ```json
 {
@@ -61,6 +62,8 @@ Exemplo `GET /recipes/1`:
   ]
 }
 ```
+
+</details>
 
 <details>
 <summary><b>Receitas</b></summary>
