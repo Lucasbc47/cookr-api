@@ -4,16 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cookr.Api.Features.Ingredients;
 
-public interface IIngredientService
-{
-    Task<List<IngredientResponse>> GetAllAsync(CancellationToken ct);
-    Task<Result<IngredientResponse>> GetByIdAsync(int id, CancellationToken ct);
-    Task<Result<IngredientResponse>> CreateAsync(CreateIngredientRequest request, CancellationToken ct);
-    Task<Result<IngredientResponse>> UpdateAsync(int id, UpdateIngredientRequest request, CancellationToken ct);
-    Task<Result> DeleteAsync(int id, CancellationToken ct);
-}
-
-public class IngredientService(CookrDbContext dbContext) : IIngredientService
+public class IngredientService(CookrDbContext dbContext)
 {
     private readonly CookrDbContext _dbContext = dbContext;
 

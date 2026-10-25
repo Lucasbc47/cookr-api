@@ -19,8 +19,8 @@ builder.Host.UseSerilog((context, config) =>
 builder.Services.AddDbContext<CookrDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("CookrDb")));
 
-builder.Services.AddScoped<IRecipeService, RecipeService>();
-builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddScoped<RecipeService>();
+builder.Services.AddScoped<IngredientService>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];

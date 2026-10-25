@@ -6,20 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cookr.Api.Features.Recipes;
 
-public interface IRecipeService
-{
-    Task<List<RecipeSummary>> GetAllAsync(CancellationToken ct);
-    Task<Result<RecipeResponse>> GetByIdAsync(int id, CancellationToken ct);
-    Task<RecipeResponse> CreateAsync(CreateRecipeRequest request, CancellationToken ct);
-    Task<Result<RecipeResponse>> UpdateAsync(int id, UpdateRecipeRequest request, CancellationToken ct);
-    Task<Result> DeleteAsync(int id, CancellationToken ct);
-
-    // RecipeIngredient
-    Task<Result> AddIngredientAsync(int recipeId, AddRecipeIngredientRequest request, CancellationToken ct);
-    Task<Result> RemoveIngredientAsync(int recipeId, int ingredientId, CancellationToken ct);
-}
-
-public class RecipeService(CookrDbContext dbContext) : IRecipeService
+public class RecipeService(CookrDbContext dbContext)
 {
     private readonly CookrDbContext _dbContext = dbContext;
 

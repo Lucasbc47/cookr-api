@@ -2,7 +2,7 @@
 
 # Cookr API
 
-**API REST do Cookr**
+**API REST do Cookr, um app de receitas pessoais.**
 
 ![Build](https://github.com/Lucasbc47/cookr-api/actions/workflows/build.yml/badge.svg)
 
@@ -17,6 +17,8 @@
 </div>
 
 ## Rodar
+
+Requer o .NET 10 SDK (versão definida no `global.json`).
 
 ```
 dotnet run --project Cookr.Api

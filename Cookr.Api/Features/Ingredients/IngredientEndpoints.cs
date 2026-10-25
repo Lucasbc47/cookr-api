@@ -9,12 +9,12 @@ public static class IngredientEndpoints
     {
         var group = app.MapGroup("/ingredients").WithTags("Ingredients");
 
-        group.MapGet("/", async (IIngredientService service, CancellationToken ct) =>
+        group.MapGet("/", async (IngredientService service, CancellationToken ct) =>
             TypedResults.Ok(await service.GetAllAsync(ct)))
             .WithSummary("Lista ingredientes");
 
         group.MapGet("/{id:int}", async Task<Results<Ok<IngredientResponse>, ProblemHttpResult>> (
-            int id, IIngredientService service, CancellationToken ct) =>
+            int id, IngredientService service, CancellationToken ct) =>
         {
             var result = await service.GetByIdAsync(id, ct);
             return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblem();
@@ -23,7 +23,7 @@ public static class IngredientEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapPost("/", async Task<Results<Created<IngredientResponse>, ProblemHttpResult>> (
-            CreateIngredientRequest request, IIngredientService service, CancellationToken ct) =>
+            CreateIngredientRequest request, IngredientService service, CancellationToken ct) =>
         {
             var result = await service.CreateAsync(request, ct);
             return result.IsSuccess
@@ -36,7 +36,7 @@ public static class IngredientEndpoints
             .ProducesValidationProblem();
 
         group.MapPut("/{id:int}", async Task<Results<Ok<IngredientResponse>, ProblemHttpResult>> (
-            int id, UpdateIngredientRequest request, IIngredientService service, CancellationToken ct) =>
+            int id, UpdateIngredientRequest request, IngredientService service, CancellationToken ct) =>
         {
             var result = await service.UpdateAsync(id, request, ct);
             return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblem();
@@ -48,7 +48,7 @@ public static class IngredientEndpoints
             .ProducesValidationProblem();
 
         group.MapDelete("/{id:int}", async Task<Results<NoContent, ProblemHttpResult>> (
-            int id, IIngredientService service, CancellationToken ct) =>
+            int id, IngredientService service, CancellationToken ct) =>
         {
             var result = await service.DeleteAsync(id, ct);
             return result.IsSuccess ? TypedResults.NoContent() : result.ToProblem();
