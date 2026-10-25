@@ -2,7 +2,7 @@ using Cookr.Api.Features.Recipes;
 
 namespace Cookr.Api.Tests;
 
-public class UnitTest1
+public class RecipeValidatorTests
 {
     [Fact]
     public void Should_fail_when_title_empty()
