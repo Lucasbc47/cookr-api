@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cookr.Api\Cookr.Api.csproj" />
+    <ProjectReference Include="..\..\src\Cookr.Api\Cookr.Api.csproj" />
   </ItemGroup>
 
 </Project>

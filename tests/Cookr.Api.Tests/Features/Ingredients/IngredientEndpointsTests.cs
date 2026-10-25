@@ -4,7 +4,7 @@ using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
 using Cookr.Domain;
 
-namespace Cookr.Api.Tests;
+namespace Cookr.Api.Tests.Features.Ingredients;
 
 public sealed class IngredientEndpointsTests : IDisposable
 {
@@ -24,7 +24,7 @@ public sealed class IngredientEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Post_duplicate_name_ignoring_case_returns_conflict()
+    public async Task Post_DuplicateNameIgnoringCase_ReturnsConflict()
     {
         await _client.PostAsJsonAsync("/ingredients", new CreateIngredientRequest("Tomate"));
 
@@ -35,7 +35,7 @@ public sealed class IngredientEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Put_with_same_name_keeps_working()
+    public async Task Put_SameNameDifferentCase_ReturnsOk()
     {
         var created = await CreateIngredientAsync("Sal");
 
@@ -45,7 +45,7 @@ public sealed class IngredientEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Delete_ingredient_in_use_returns_conflict()
+    public async Task Delete_IngredientInUse_ReturnsConflict()
     {
         var ingredient = await CreateIngredientAsync("Farinha");
         var recipeResponse = await _client.PostAsJsonAsync("/recipes", new CreateRecipeRequest("Pao", "...", 90, 4));
@@ -59,7 +59,7 @@ public sealed class IngredientEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Delete_unused_ingredient_returns_no_content()
+    public async Task Delete_UnusedIngredient_ReturnsNoContent()
     {
         var ingredient = await CreateIngredientAsync("Acucar");
 

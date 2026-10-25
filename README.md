@@ -21,7 +21,7 @@
 Requer o .NET 10 SDK (versão definida no `global.json`).
 
 ```
-dotnet run --project Cookr.Api
+dotnet run --project src/Cookr.Api
 ```
 
 > _Em Development, as migrations são aplicadas sozinhas ao subir a API (`MigrateAndSeedAsync` no `Program.cs`)._
@@ -38,10 +38,13 @@ dotnet test
 ## Estrutura
 
 ```
-Cookr.Domain/          entidades e suas regras
-Cookr.Infrastructure/  DbContext e migrations
-Cookr.Api/             endpoints, services, DTOs e validação, por feature
-Cookr.Api.Tests/       testes de domínio, validação e integração
+src/
+  Cookr.Domain/
+  Cookr.Infrastructure/
+  Cookr.Api/
+tests/
+  Cookr.Domain.Tests/
+  Cookr.Api.Tests/
 ```
 
 ## Endpoints
@@ -58,7 +61,12 @@ Cookr.Api.Tests/       testes de domínio, validação e integração
   "servings": 8,
   "ingredients": [
     { "ingredientId": 1, "name": "Cenoura", "quantity": 3, "unit": "unit" },
-    { "ingredientId": 3, "name": "Farinha de trigo", "quantity": 2, "unit": "cup" }
+    {
+      "ingredientId": 3,
+      "name": "Farinha de trigo",
+      "quantity": 2,
+      "unit": "cup"
+    }
   ]
 }
 ```
@@ -68,14 +76,14 @@ Cookr.Api.Tests/       testes de domínio, validação e integração
 <details>
 <summary><b>Receitas</b></summary>
 
-| Método | Rota | Ação |
-| --- | --- | --- |
-| `GET` | `/recipes` | Lista receitas |
-| `GET` | `/recipes/{id}` | Receita com ingredientes |
-| `POST` | `/recipes` | Cria receita |
-| `PUT` | `/recipes/{id}` | Atualiza receita |
-| `DELETE` | `/recipes/{id}` | Remove receita |
-| `POST` | `/recipes/{id}/ingredients` | Adiciona ingrediente |
+| Método   | Rota                                       | Ação                          |
+| -------- | ------------------------------------------ | ----------------------------- |
+| `GET`    | `/recipes`                                 | Lista receitas                |
+| `GET`    | `/recipes/{id}`                            | Receita com ingredientes      |
+| `POST`   | `/recipes`                                 | Cria receita                  |
+| `PUT`    | `/recipes/{id}`                            | Atualiza receita              |
+| `DELETE` | `/recipes/{id}`                            | Remove receita                |
+| `POST`   | `/recipes/{id}/ingredients`                | Adiciona ingrediente          |
 | `DELETE` | `/recipes/{id}/ingredients/{ingredientId}` | Remove ingrediente da receita |
 
 </details>
@@ -83,12 +91,12 @@ Cookr.Api.Tests/       testes de domínio, validação e integração
 <details>
 <summary><b>Ingredientes</b></summary>
 
-| Método | Rota | Ação |
-| --- | --- | --- |
-| `GET` | `/ingredients` | Lista ingredientes |
-| `GET` | `/ingredients/{id}` | Ingrediente por id |
-| `POST` | `/ingredients` | Cria ingrediente |
-| `PUT` | `/ingredients/{id}` | Atualiza ingrediente |
+| Método   | Rota                | Ação                                       |
+| -------- | ------------------- | ------------------------------------------ |
+| `GET`    | `/ingredients`      | Lista ingredientes                         |
+| `GET`    | `/ingredients/{id}` | Ingrediente por id                         |
+| `POST`   | `/ingredients`      | Cria ingrediente                           |
+| `PUT`    | `/ingredients/{id}` | Atualiza ingrediente                       |
 | `DELETE` | `/ingredients/{id}` | Remove ingrediente (409 se estiver em uso) |
 
 </details>

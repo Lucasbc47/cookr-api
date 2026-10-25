@@ -5,7 +5,7 @@ using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
 using Cookr.Domain;
 
-namespace Cookr.Api.Tests;
+namespace Cookr.Api.Tests.Features.Recipes;
 
 public sealed class RecipeEndpointsTests : IDisposable
 {
@@ -25,7 +25,7 @@ public sealed class RecipeEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Put_returns_recipe_with_ingredients()
+    public async Task Put_RecipeWithIngredients_ReturnsIngredients()
     {
         var recipe = await CreateRecipeAsync();
         var ingredient = await CreateIngredientAsync("Cenoura");
@@ -45,7 +45,7 @@ public sealed class RecipeEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Unit_is_sent_as_camel_case_text()
+    public async Task Get_RecipeWithIngredient_ReturnsUnitAsCamelCaseText()
     {
         var recipe = await CreateRecipeAsync();
         var ingredient = await CreateIngredientAsync("Leite");
@@ -60,7 +60,7 @@ public sealed class RecipeEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Unknown_unit_returns_bad_request()
+    public async Task AddIngredient_UnknownUnit_ReturnsBadRequest()
     {
         var recipe = await CreateRecipeAsync();
         var ingredient = await CreateIngredientAsync("Sal");
@@ -76,7 +76,7 @@ public sealed class RecipeEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Get_missing_recipe_returns_problem_details()
+    public async Task Get_MissingRecipe_ReturnsNotFoundProblem()
     {
         var response = await _client.GetAsync("/recipes/999");
 
@@ -86,7 +86,7 @@ public sealed class RecipeEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Post_invalid_recipe_returns_errors_by_camel_case_field()
+    public async Task Post_InvalidRecipe_ReturnsErrorsByCamelCaseField()
     {
         var response = await _client.PostAsJsonAsync("/recipes", new CreateRecipeRequest("", "...", 0, 0));
 
@@ -100,7 +100,7 @@ public sealed class RecipeEndpointsTests : IDisposable
     }
 
     [Fact]
-    public async Task Add_same_ingredient_twice_returns_conflict()
+    public async Task AddIngredient_SameIngredientTwice_ReturnsConflict()
     {
         var recipe = await CreateRecipeAsync();
         var ingredient = await CreateIngredientAsync("Ovo");
