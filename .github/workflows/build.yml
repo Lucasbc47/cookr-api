@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  DOTNET_VERSION: "8.x"
+  DOTNET_VERSION: "10.x"
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
         run: dotnet restore Cookr.sln
 
       - name: Build
-        run: dotnet build Cookr.sln --configuration Release --no-restore
+        run: dotnet build Cookr.sln --configuration Release --no-restore -warnaserror
 
       - name: Test
         run: dotnet test Cookr.sln --configuration Release --no-build

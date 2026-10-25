@@ -69,32 +69,34 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
 
     public async Task<Result> AddIngredientAsync(int recipeId, AddRecipeIngredientRequest request, CancellationToken ct)
     {
-        if (!await _dbContext.Recipes.AnyAsync(r => r.Id == recipeId, ct))
-        {
-            return Result.NotFound(NotFoundError);
-        }
+        var recipe = await _dbContext.Recipes
+            .Include(r => r.RecipeIngredients)
+            .FirstOrDefaultAsync(r => r.Id == recipeId, ct);
+        if (recipe is null) return Result.NotFound(NotFoundError);
 
         if (!await _dbContext.Ingredients.AnyAsync(i => i.Id == request.IngredientId, ct))
         {
             return Result.NotFound("Ingredient not found");
         }
 
-        var alreadyAdded = await _dbContext.RecipeIngredients
-            .AnyAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == request.IngredientId, ct);
-        if (alreadyAdded) return Result.Conflict("Ingredient already added to this recipe");
+        if (!recipe.AddIngredient(request.IngredientId, request.Quantity, request.Unit))
+        {
+            return Result.Conflict("Ingredient already added to this recipe");
+        }
 
-        _dbContext.RecipeIngredients.Add(request.ToEntity(recipeId));
         await _dbContext.SaveChangesAsync(ct);
         return Result.Success();
     }
 
     public async Task<Result> RemoveIngredientAsync(int recipeId, int ingredientId, CancellationToken ct)
     {
-        var link = await _dbContext.RecipeIngredients
-            .FirstOrDefaultAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == ingredientId, ct);
-        if (link is null) return Result.NotFound("Ingredient not linked to this recipe");
+        var recipe = await _dbContext.Recipes
+            .Include(r => r.RecipeIngredients)
+            .FirstOrDefaultAsync(r => r.Id == recipeId, ct);
+        if (recipe is null) return Result.NotFound(NotFoundError);
 
-        _dbContext.RecipeIngredients.Remove(link);
+        if (!recipe.RemoveIngredient(ingredientId)) return Result.NotFound("Ingredient not linked to this recipe");
+
         await _dbContext.SaveChangesAsync(ct);
         return Result.Success();
     }

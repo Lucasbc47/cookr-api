@@ -2,7 +2,9 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
+using Cookr.Api.Shared;
 using Cookr.Infrastructure;
+using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
 
@@ -26,8 +28,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy => policy.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
 
 builder.Services.AddProblemDetails();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
@@ -37,17 +38,20 @@ app.UseStatusCodePages();
 app.UseSerilogRequestLogging(options =>
 {
     options.GetLevel = (ctx, _, ex) =>
-        ex is not null || ctx.Response.StatusCode >= 500 ? LogEventLevel.Error
-        : ctx.Request.Path.StartsWithSegments("/swagger") ? LogEventLevel.Verbose
-        : LogEventLevel.Information;
+    {
+        if (ex is not null || ctx.Response.StatusCode >= 500) return LogEventLevel.Error;
+        if (ctx.Request.Path.StartsWithSegments("/scalar")) return LogEventLevel.Verbose;
+        return LogEventLevel.Information;
+    };
 });
 
 app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    await app.MigrateAndSeedAsync();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 var version = typeof(Program).Assembly.GetName().Version?.ToString(3);
@@ -56,4 +60,4 @@ app.MapGet("/", () => Results.Ok(new { message = "Cookr is running!", version })
 app.MapRecipeEndpoints();
 app.MapIngredientEndpoints();
 
-app.Run();
+await app.RunAsync();

@@ -35,7 +35,7 @@ public class CookrDbContext(DbContextOptions<CookrDbContext> options) : DbContex
                 .HasForeignKey(ri => ri.RecipeId);
 
             entity.HasOne(ri => ri.Ingredient)
-                .WithMany(i => i.RecipeIngredients)
+                .WithMany()
                 .HasForeignKey(ri => ri.IngredientId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
