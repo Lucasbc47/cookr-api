@@ -1,6 +1,7 @@
+using System.Text.Json;
 using FluentValidation;
 
-namespace Cookr.Api;
+namespace Cookr.Api.Shared;
 
 public class ValidationFilter<T> : IEndpointFilter
 {
@@ -11,8 +12,14 @@ public class ValidationFilter<T> : IEndpointFilter
 
         var argument = context.Arguments.OfType<T>().First();
         var result = await validator.ValidateAsync(argument);
-        if (!result.IsValid) return Results.ValidationProblem(result.ToDictionary());
+        if (result.IsValid) return await next(context);
 
-        return await next(context);
+        var errors = result.Errors
+            .GroupBy(e => JsonNamingPolicy.CamelCase.ConvertName(e.PropertyName))
+            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+
+        return TypedResults.ValidationProblem(
+            errors,
+            extensions: new Dictionary<string, object?> { ["code"] = ErrorCodes.ValidationFailed });
     }
 }

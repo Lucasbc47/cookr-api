@@ -14,7 +14,7 @@ namespace Cookr.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
             modelBuilder.Entity("Cookr.Domain.Ingredient", b =>
                 {
@@ -24,9 +24,14 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Ingredients");
                 });
@@ -39,6 +44,7 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Instructions")
                         .IsRequired()
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("PrepTimeMinutes")
@@ -49,6 +55,7 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -69,21 +76,25 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Unit")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("RecipeId", "IngredientId");
 
                     b.HasIndex("IngredientId");
 
-                    b.ToTable("RecipeIngredients");
+                    b.ToTable("RecipeIngredients", t =>
+                        {
+                            t.HasCheckConstraint("CK_RecipeIngredients_Unit", "\"Unit\" IN ('Unit', 'Gram', 'Kilogram', 'Milliliter', 'Liter', 'Cup', 'Tablespoon', 'Teaspoon', 'Pinch')");
+                        });
                 });
 
             modelBuilder.Entity("Cookr.Domain.RecipeIngredient", b =>
                 {
                     b.HasOne("Cookr.Domain.Ingredient", "Ingredient")
-                        .WithMany("RecipeIngredients")
+                        .WithMany()
                         .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Cookr.Domain.Recipe", "Recipe")
@@ -95,11 +106,6 @@ namespace Cookr.Infrastructure.Migrations
                     b.Navigation("Ingredient");
 
                     b.Navigation("Recipe");
-                });
-
-            modelBuilder.Entity("Cookr.Domain.Ingredient", b =>
-                {
-                    b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("Cookr.Domain.Recipe", b =>

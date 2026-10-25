@@ -1,99 +1,95 @@
+using Cookr.Api.Features.Ingredients;
+using Cookr.Api.Shared;
 using Cookr.Domain;
 using Cookr.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cookr.Api.Features.Recipes;
 
-public interface IRecipeService
-{
-    Task<List<RecipeSummary>> GetAllAsync();
-    Task<Recipe?> GetByIdAsync(int id);
-    Task<Recipe> CreateAsync(Recipe recipe);
-    Task<Recipe?> UpdateAsync(int id, UpdateRecipeRequest request);
-    Task<bool> DeleteAsync(int id);
-
-    // RecipeIngredient
-    Task<AddIngredientResult> AddIngredientAsync(int recipeId, AddRecipeIngredientRequest request);
-    Task<bool> RemoveIngredientAsync(int recipeId, int ingredientId);
-}
-
-public class RecipeService(CookrDbContext dbContext) : IRecipeService
+public class RecipeService(CookrDbContext dbContext)
 {
     private readonly CookrDbContext _dbContext = dbContext;
-    public async Task<List<RecipeSummary>> GetAllAsync()
+
+    public async Task<List<RecipeSummary>> GetAllAsync(CancellationToken ct)
     {
         return await _dbContext.Recipes
             .Select(r => new RecipeSummary(r.Id, r.Title))
-            .ToListAsync();
+            .ToListAsync(ct);
     }
 
-    public async Task<Recipe?> GetByIdAsync(int id)
+    public async Task<Result<RecipeResponse>> GetByIdAsync(int id, CancellationToken ct)
     {
-        return await _dbContext.Recipes
-            .Include(r => r.RecipeIngredients)
-            .ThenInclude(ri => ri.Ingredient)
-            .FirstOrDefaultAsync(r => r.Id == id);
+        var recipe = await FindWithIngredientsAsync(id, ct);
+        return recipe is not null
+            ? Result<RecipeResponse>.Success(recipe.ToResponse())
+            : Result<RecipeResponse>.NotFound(RecipeErrors.NotFound);
     }
 
-    public async Task<Recipe> CreateAsync(Recipe recipe)
+    public async Task<RecipeResponse> CreateAsync(CreateRecipeRequest request, CancellationToken ct)
     {
-        await _dbContext.Recipes.AddAsync(recipe);
-        await _dbContext.SaveChangesAsync();
-        return recipe;
+        var recipe = request.ToEntity();
+        _dbContext.Recipes.Add(recipe);
+        await _dbContext.SaveChangesAsync(ct);
+        return recipe.ToResponse();
     }
 
-    public async Task<Recipe?> UpdateAsync(int id, UpdateRecipeRequest request)
+    public async Task<Result<RecipeResponse>> UpdateAsync(int id, UpdateRecipeRequest request, CancellationToken ct)
     {
-        var recipe = await GetByIdAsync(id);
-        if (recipe is null) return null;
+        var recipe = await FindWithIngredientsAsync(id, ct);
+        if (recipe is null) return Result<RecipeResponse>.NotFound(RecipeErrors.NotFound);
 
         request.ApplyTo(recipe);
-        await _dbContext.SaveChangesAsync();
-        return recipe;
+        await _dbContext.SaveChangesAsync(ct);
+        return Result<RecipeResponse>.Success(recipe.ToResponse());
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<Result> DeleteAsync(int id, CancellationToken ct)
     {
-        var recipe = await _dbContext.Recipes.FindAsync(id);
-        if (recipe is null) return false;
+        var recipe = await _dbContext.Recipes.FindAsync([id], ct);
+        if (recipe is null) return Result.NotFound(RecipeErrors.NotFound);
 
         _dbContext.Recipes.Remove(recipe);
-        await _dbContext.SaveChangesAsync();
-        return true;
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success();
     }
 
-    public async Task<AddIngredientResult> AddIngredientAsync(int recipeId, AddRecipeIngredientRequest request)
+    public async Task<Result> AddIngredientAsync(int recipeId, AddRecipeIngredientRequest request, CancellationToken ct)
     {
-        var recipe = await _dbContext.Recipes.FindAsync(recipeId);
-        if (recipe is null) return AddIngredientResult.RecipeNotFound;
+        var recipe = await _dbContext.Recipes
+            .Include(r => r.RecipeIngredients)
+            .FirstOrDefaultAsync(r => r.Id == recipeId, ct);
+        if (recipe is null) return Result.NotFound(RecipeErrors.NotFound);
 
-        var ingredient = await _dbContext.Ingredients.FindAsync(request.IngredientId);
-        if (ingredient is null) return AddIngredientResult.IngredientNotFound;
-
-        var alreadyAdded = await _dbContext.RecipeIngredients
-            .AnyAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == request.IngredientId);
-
-        if (alreadyAdded) return AddIngredientResult.AlreadyAdded;
-        var recipeIngredient = new RecipeIngredient
+        if (!await _dbContext.Ingredients.AnyAsync(i => i.Id == request.IngredientId, ct))
         {
-            RecipeId = recipeId,
-            IngredientId = request.IngredientId,
-            Quantity = request.Quantity,
-            Unit = request.Unit
-        };
-        _dbContext.RecipeIngredients.Add(recipeIngredient);
-        await _dbContext.SaveChangesAsync();
-        return AddIngredientResult.Success;
+            return Result.NotFound(IngredientErrors.NotFound);
+        }
 
+        if (!recipe.AddIngredient(request.IngredientId, request.Quantity, request.Unit))
+        {
+            return Result.Conflict(RecipeErrors.IngredientAlreadyAdded);
+        }
+
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success();
     }
-    public async Task<bool> RemoveIngredientAsync(int recipeId, int ingredientId)
+
+    public async Task<Result> RemoveIngredientAsync(int recipeId, int ingredientId, CancellationToken ct)
     {
-        var link = await _dbContext.RecipeIngredients
-            .FirstOrDefaultAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == ingredientId);
-        if (link is null) return false;
+        var recipe = await _dbContext.Recipes
+            .Include(r => r.RecipeIngredients)
+            .FirstOrDefaultAsync(r => r.Id == recipeId, ct);
+        if (recipe is null) return Result.NotFound(RecipeErrors.NotFound);
 
-        _dbContext.RecipeIngredients.Remove(link);
-        await _dbContext.SaveChangesAsync();
-        return true;
+        if (!recipe.RemoveIngredient(ingredientId)) return Result.NotFound(RecipeErrors.IngredientNotInRecipe);
+
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success();
     }
+
+    private Task<Recipe?> FindWithIngredientsAsync(int id, CancellationToken ct) =>
+        _dbContext.Recipes
+            .Include(r => r.RecipeIngredients)
+            .ThenInclude(ri => ri.Ingredient)
+            .FirstOrDefaultAsync(r => r.Id == id, ct);
 }

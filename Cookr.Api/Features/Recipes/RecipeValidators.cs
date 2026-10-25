@@ -1,3 +1,4 @@
+using Cookr.Domain;
 using FluentValidation;
 
 namespace Cookr.Api.Features.Recipes;
@@ -6,7 +7,8 @@ public class CreateRecipeRequestValidator : AbstractValidator<CreateRecipeReques
 {
     public CreateRecipeRequestValidator()
     {
-        RuleFor(x => x.Title).NotEmpty();
+        RuleFor(x => x.Title).NotEmpty().MaximumLength(Recipe.TitleMaxLength);
+        RuleFor(x => x.Instructions).MaximumLength(Recipe.InstructionsMaxLength);
         RuleFor(x => x.PrepTimeMinutes).GreaterThan(0);
         RuleFor(x => x.Servings).GreaterThan(0);
     }
@@ -16,7 +18,8 @@ public class UpdateRecipeRequestValidator : AbstractValidator<UpdateRecipeReques
 {
     public UpdateRecipeRequestValidator()
     {
-        RuleFor(x => x.Title).NotEmpty();
+        RuleFor(x => x.Title).NotEmpty().MaximumLength(Recipe.TitleMaxLength);
+        RuleFor(x => x.Instructions).MaximumLength(Recipe.InstructionsMaxLength);
         RuleFor(x => x.PrepTimeMinutes).GreaterThan(0);
         RuleFor(x => x.Servings).GreaterThan(0);
     }
@@ -28,6 +31,6 @@ public class AddRecipeIngredientRequestValidator : AbstractValidator<AddRecipeIn
     {
         RuleFor(x => x.IngredientId).GreaterThan(0);
         RuleFor(x => x.Quantity).GreaterThan(0);
-        RuleFor(x => x.Unit).NotEmpty();
+        RuleFor(x => x.Unit).IsInEnum();
     }
 }

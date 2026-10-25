@@ -1,3 +1,4 @@
+using Cookr.Domain;
 using FluentValidation;
 
 namespace Cookr.Api.Features.Ingredients;
@@ -6,7 +7,7 @@ public class CreateIngredientRequestValidator : AbstractValidator<CreateIngredie
 {
     public CreateIngredientRequestValidator()
     {
-        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(Ingredient.NameMaxLength);
     }
 }
 
@@ -14,6 +15,6 @@ public class UpdateIngredientRequestValidator : AbstractValidator<UpdateIngredie
 {
     public UpdateIngredientRequestValidator()
     {
-        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(Ingredient.NameMaxLength);
     }
 }
