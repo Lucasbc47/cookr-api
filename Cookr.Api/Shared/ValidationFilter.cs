@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Cookr.Api;
+namespace Cookr.Api.Shared;
 
 public class ValidationFilter<T> : IEndpointFilter
 {

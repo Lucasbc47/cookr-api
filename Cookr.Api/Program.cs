@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Cookr.Api;
 using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
 using Cookr.Infrastructure;
