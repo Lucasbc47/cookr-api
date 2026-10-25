@@ -31,6 +31,6 @@ public class AddRecipeIngredientRequestValidator : AbstractValidator<AddRecipeIn
     {
         RuleFor(x => x.IngredientId).GreaterThan(0);
         RuleFor(x => x.Quantity).GreaterThan(0);
-        RuleFor(x => x.Unit).NotEmpty().MaximumLength(RecipeIngredient.UnitMaxLength);
+        RuleFor(x => x.Unit).IsInEnum();
     }
 }

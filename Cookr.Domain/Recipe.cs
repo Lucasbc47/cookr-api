@@ -31,11 +31,11 @@ public class Recipe
         Servings = servings;
     }
 
-    public bool AddIngredient(int ingredientId, decimal quantity, string unit)
+    public bool AddIngredient(int ingredientId, decimal quantity, MeasurementUnit unit)
     {
         if (_recipeIngredients.Exists(ri => ri.IngredientId == ingredientId)) return false;
 
-        _recipeIngredients.Add(new RecipeIngredient(ingredientId, quantity, unit.Trim()));
+        _recipeIngredients.Add(new RecipeIngredient(ingredientId, quantity, unit));
         return true;
     }
 

@@ -1,3 +1,6 @@
+using System.Net.Http.Json;
+using System.Text.Json;
+using Cookr.Api.Shared;
 using Cookr.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -12,6 +15,21 @@ namespace Cookr.Api.Tests;
 internal class CookrApiFactory : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _connection = new("Data Source=:memory:");
+
+    public static JsonSerializerOptions Json { get; } = CreateJsonOptions();
+
+    public static async Task<string?> ErrorCodeAsync(HttpResponseMessage response)
+    {
+        var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
+        return problem.GetProperty("code").GetString();
+    }
+
+    private static JsonSerializerOptions CreateJsonOptions()
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        JsonConfig.Apply(options);
+        return options;
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

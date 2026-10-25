@@ -27,10 +27,10 @@ public static class DevelopmentDatabase
             "Bata cenoura, ovos e óleo no liquidificador. Misture com os secos. Asse 40 min a 180°C.",
             60,
             8);
-        cake.AddIngredient(carrot.Id, 3, "un");
-        cake.AddIngredient(egg.Id, 3, "un");
-        cake.AddIngredient(flour.Id, 2, "xícara");
-        cake.AddIngredient(sugar.Id, 1.5m, "xícara");
+        cake.AddIngredient(carrot.Id, 3, MeasurementUnit.Unit);
+        cake.AddIngredient(egg.Id, 3, MeasurementUnit.Unit);
+        cake.AddIngredient(flour.Id, 2, MeasurementUnit.Cup);
+        cake.AddIngredient(sugar.Id, 1.5m, MeasurementUnit.Cup);
 
         dbContext.Recipes.Add(cake);
         await dbContext.SaveChangesAsync();

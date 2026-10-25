@@ -6,7 +6,7 @@ public class RecipeIngredient
 
     private RecipeIngredient() { }
 
-    internal RecipeIngredient(int ingredientId, decimal quantity, string unit)
+    internal RecipeIngredient(int ingredientId, decimal quantity, MeasurementUnit unit)
     {
         IngredientId = ingredientId;
         Quantity = quantity;
@@ -20,5 +20,5 @@ public class RecipeIngredient
     public int IngredientId { get; private set; }
     public Ingredient Ingredient { get; private set; } = null!;
     public decimal Quantity { get; private set; }
-    public string Unit { get; private set; } = string.Empty;
+    public MeasurementUnit Unit { get; private set; }
 }

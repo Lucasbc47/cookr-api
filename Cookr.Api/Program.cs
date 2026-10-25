@@ -27,13 +27,13 @@ var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy => policy.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
 
-builder.Services.AddProblemDetails();
+builder.Services.ConfigureHttpJsonOptions(options => JsonConfig.Apply(options.SerializerOptions));
+builder.Services.AddErrorHandling();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
-app.UseStatusCodePages();
+app.UseErrorHandling();
 
 app.UseSerilogRequestLogging(options =>
 {

@@ -1,3 +1,4 @@
+using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Shared;
 using Cookr.Domain;
 using Cookr.Infrastructure;
@@ -20,8 +21,6 @@ public interface IRecipeService
 
 public class RecipeService(CookrDbContext dbContext) : IRecipeService
 {
-    private const string NotFoundError = "Recipe not found";
-
     private readonly CookrDbContext _dbContext = dbContext;
 
     public async Task<List<RecipeSummary>> GetAllAsync(CancellationToken ct)
@@ -36,7 +35,7 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
         var recipe = await FindWithIngredientsAsync(id, ct);
         return recipe is not null
             ? Result<RecipeResponse>.Success(recipe.ToResponse())
-            : Result<RecipeResponse>.NotFound(NotFoundError);
+            : Result<RecipeResponse>.NotFound(RecipeErrors.NotFound);
     }
 
     public async Task<RecipeResponse> CreateAsync(CreateRecipeRequest request, CancellationToken ct)
@@ -50,7 +49,7 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
     public async Task<Result<RecipeResponse>> UpdateAsync(int id, UpdateRecipeRequest request, CancellationToken ct)
     {
         var recipe = await FindWithIngredientsAsync(id, ct);
-        if (recipe is null) return Result<RecipeResponse>.NotFound(NotFoundError);
+        if (recipe is null) return Result<RecipeResponse>.NotFound(RecipeErrors.NotFound);
 
         request.ApplyTo(recipe);
         await _dbContext.SaveChangesAsync(ct);
@@ -60,7 +59,7 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
     public async Task<Result> DeleteAsync(int id, CancellationToken ct)
     {
         var recipe = await _dbContext.Recipes.FindAsync([id], ct);
-        if (recipe is null) return Result.NotFound(NotFoundError);
+        if (recipe is null) return Result.NotFound(RecipeErrors.NotFound);
 
         _dbContext.Recipes.Remove(recipe);
         await _dbContext.SaveChangesAsync(ct);
@@ -72,16 +71,16 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
         var recipe = await _dbContext.Recipes
             .Include(r => r.RecipeIngredients)
             .FirstOrDefaultAsync(r => r.Id == recipeId, ct);
-        if (recipe is null) return Result.NotFound(NotFoundError);
+        if (recipe is null) return Result.NotFound(RecipeErrors.NotFound);
 
         if (!await _dbContext.Ingredients.AnyAsync(i => i.Id == request.IngredientId, ct))
         {
-            return Result.NotFound("Ingredient not found");
+            return Result.NotFound(IngredientErrors.NotFound);
         }
 
         if (!recipe.AddIngredient(request.IngredientId, request.Quantity, request.Unit))
         {
-            return Result.Conflict("Ingredient already added to this recipe");
+            return Result.Conflict(RecipeErrors.IngredientAlreadyAdded);
         }
 
         await _dbContext.SaveChangesAsync(ct);
@@ -93,9 +92,9 @@ public class RecipeService(CookrDbContext dbContext) : IRecipeService
         var recipe = await _dbContext.Recipes
             .Include(r => r.RecipeIngredients)
             .FirstOrDefaultAsync(r => r.Id == recipeId, ct);
-        if (recipe is null) return Result.NotFound(NotFoundError);
+        if (recipe is null) return Result.NotFound(RecipeErrors.NotFound);
 
-        if (!recipe.RemoveIngredient(ingredientId)) return Result.NotFound("Ingredient not linked to this recipe");
+        if (!recipe.RemoveIngredient(ingredientId)) return Result.NotFound(RecipeErrors.IngredientNotInRecipe);
 
         await _dbContext.SaveChangesAsync(ct);
         return Result.Success();

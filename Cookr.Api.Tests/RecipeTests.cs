@@ -9,8 +9,8 @@ public class RecipeTests
     {
         var recipe = new Recipe("Bolo", "...", 40, 8);
 
-        Assert.True(recipe.AddIngredient(1, 3, "un"));
-        Assert.False(recipe.AddIngredient(1, 2, "un"));
+        Assert.True(recipe.AddIngredient(1, 3, MeasurementUnit.Unit));
+        Assert.False(recipe.AddIngredient(1, 2, MeasurementUnit.Unit));
         Assert.Single(recipe.RecipeIngredients);
     }
 

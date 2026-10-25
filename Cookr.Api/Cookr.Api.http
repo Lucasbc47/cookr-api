@@ -48,7 +48,7 @@ Content-Type: application/json
 {
     "ingredientId": 2,
     "quantity": 3,
-    "unit": "un"
+    "unit": "unit"
 }
 
 ### DELETE ingredient da recipe

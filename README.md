@@ -1,15 +1,20 @@
+<div align="center">
+
 # Cookr API
 
-API de receitas pessoais: cada receita tem seus ingredientes, com quantidade e unidade.
+**API REST do Cookr**
 
-Projeto de estudo em .NET 8 com Minimal API, EF Core e SQLite.
+![Build](https://github.com/Lucasbc47/cookr-api/actions/workflows/build.yml/badge.svg)
 
-## Stack
+![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
+![Minimal API](https://img.shields.io/badge/Minimal_API-ASP.NET_Core-512BD4)
+![EF Core](https://img.shields.io/badge/EF_Core-10-512BD4)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
+![FluentValidation](https://img.shields.io/badge/FluentValidation-2C3E50)
+![Serilog](https://img.shields.io/badge/Serilog-1E88E5)
+![Scalar](https://img.shields.io/badge/Docs-Scalar-1A1A1A)
 
-- .NET 8 / Minimal API
-- EF Core 8 + SQLite
-- Serilog
-- Swagger (dev)
+</div>
 
 ## Rodar
 
@@ -17,64 +22,68 @@ Projeto de estudo em .NET 8 com Minimal API, EF Core e SQLite.
 dotnet run --project Cookr.Api
 ```
 
-- API: `http://localhost:5021`
-- Swagger: `http://localhost:5021/swagger` (só em Development)
-- `GET /` responde a versão em execução
+> _Em Development, as migrations são aplicadas sozinhas ao subir a API (`MigrateAndSeedAsync` no `Program.cs`)._
 
-Banco SQLite em `Cookr.Api/Data/cookr.db`, criado via migrations:
+- API: `http://localhost:5021`
+- Scalar: `http://localhost:5021/scalar`
+
+## Testes
 
 ```
-dotnet ef database update --project Cookr.Infrastructure --startup-project Cookr.Api
+dotnet test
+```
+
+## Estrutura
+
+```
+Cookr.Domain/          entidades e suas regras
+Cookr.Infrastructure/  DbContext e migrations
+Cookr.Api/             endpoints, services, DTOs e validação, por feature
+Cookr.Api.Tests/       testes de domínio, validação e integração
 ```
 
 ## Endpoints
 
-### Receitas
+Exemplo `GET /recipes/1`:
 
-| Método | Rota           | Faz                               |
-| ------ | -------------- | --------------------------------- |
-| GET    | /recipes       | Lista receitas (id + título)      |
-| GET    | /recipes/{id}  | Receita completa com ingredientes |
-| POST   | /recipes       | Cria receita                      |
-| PUT    | /recipes/{id}  | Atualiza receita                  |
-| DELETE | /recipes/{id}  | Remove receita                    |
-
-### Ingredientes da receita
-
-| Método | Rota                                     | Faz                                   |
-| ------ | ---------------------------------------- | ------------------------------------- |
-| POST   | /recipes/{id}/ingredients                | Vincula ingrediente (quantity + unit) |
-| DELETE | /recipes/{id}/ingredients/{ingredientId} | Desvincula ingrediente                |
-
-### Ingredientes
-
-| Método | Rota               | Faz                  |
-| ------ | ------------------ | -------------------- |
-| GET    | /ingredients       | Lista ingredientes   |
-| GET    | /ingredients/{id}  | Ingrediente por id   |
-| POST   | /ingredients       | Cria ingrediente     |
-| PUT    | /ingredients/{id}  | Atualiza ingrediente |
-| DELETE | /ingredients/{id}  | Remove ingrediente   |
-
-Exemplos de request prontos em `Cookr.Api/Cookr.Api.http`.
-
-## Arquitetura
-
-```
-cookr-api/
-  Cookr.Api/            -> Web API, features em vertical slice
-  Cookr.Domain/         -> entidades
-  Cookr.Infrastructure/ -> DbContext + migrations
+```json
+{
+  "id": 1,
+  "title": "Bolo de cenoura",
+  "instructions": "Bata cenoura, ovos e óleo no liquidificador...",
+  "prepTimeMinutes": 60,
+  "servings": 8,
+  "ingredients": [
+    { "ingredientId": 1, "name": "Cenoura", "quantity": 3, "unit": "unit" },
+    { "ingredientId": 3, "name": "Farinha de trigo", "quantity": 2, "unit": "cup" }
+  ]
+}
 ```
 
-Cada feature vive numa pasta própria com 4 arquivos:
+<details>
+<summary><b>Receitas</b></summary>
 
-```
-Features/Recipes/
-  RecipeEndpoints.cs   -> rotas (MapGroup)
-  RecipeService.cs     -> interface + service (injeta DbContext direto, sem repository)
-  RecipeModels.cs      -> records de request/response
-  RecipeMappings.cs    -> ToEntity() / ToResponse() / ApplyTo()
-```
+| Método | Rota | Ação |
+| --- | --- | --- |
+| `GET` | `/recipes` | Lista receitas |
+| `GET` | `/recipes/{id}` | Receita com ingredientes |
+| `POST` | `/recipes` | Cria receita |
+| `PUT` | `/recipes/{id}` | Atualiza receita |
+| `DELETE` | `/recipes/{id}` | Remove receita |
+| `POST` | `/recipes/{id}/ingredients` | Adiciona ingrediente |
+| `DELETE` | `/recipes/{id}/ingredients/{ingredientId}` | Remove ingrediente da receita |
 
-Endpoint nunca devolve entidade crua, sempre DTO. Sem camada de repository nem Application.
+</details>
+
+<details>
+<summary><b>Ingredientes</b></summary>
+
+| Método | Rota | Ação |
+| --- | --- | --- |
+| `GET` | `/ingredients` | Lista ingredientes |
+| `GET` | `/ingredients/{id}` | Ingrediente por id |
+| `POST` | `/ingredients` | Cria ingrediente |
+| `PUT` | `/ingredients/{id}` | Atualiza ingrediente |
+| `DELETE` | `/ingredients/{id}` | Remove ingrediente (409 se estiver em uso) |
+
+</details>

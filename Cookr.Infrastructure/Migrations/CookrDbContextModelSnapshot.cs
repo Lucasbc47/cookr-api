@@ -14,7 +14,7 @@ namespace Cookr.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
             modelBuilder.Entity("Cookr.Domain.Ingredient", b =>
                 {
@@ -83,13 +83,16 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.HasIndex("IngredientId");
 
-                    b.ToTable("RecipeIngredients");
+                    b.ToTable("RecipeIngredients", t =>
+                        {
+                            t.HasCheckConstraint("CK_RecipeIngredients_Unit", "\"Unit\" IN ('Unit', 'Gram', 'Kilogram', 'Milliliter', 'Liter', 'Cup', 'Tablespoon', 'Teaspoon', 'Pinch')");
+                        });
                 });
 
             modelBuilder.Entity("Cookr.Domain.RecipeIngredient", b =>
                 {
                     b.HasOne("Cookr.Domain.Ingredient", "Ingredient")
-                        .WithMany("RecipeIngredients")
+                        .WithMany()
                         .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -103,11 +106,6 @@ namespace Cookr.Infrastructure.Migrations
                     b.Navigation("Ingredient");
 
                     b.Navigation("Recipe");
-                });
-
-            modelBuilder.Entity("Cookr.Domain.Ingredient", b =>
-                {
-                    b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("Cookr.Domain.Recipe", b =>

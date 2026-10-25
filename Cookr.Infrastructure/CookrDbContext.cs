@@ -28,7 +28,11 @@ public class CookrDbContext(DbContextOptions<CookrDbContext> options) : DbContex
         modelBuilder.Entity<RecipeIngredient>(entity =>
         {
             entity.HasKey(ri => new { ri.RecipeId, ri.IngredientId });
-            entity.Property(ri => ri.Unit).HasMaxLength(RecipeIngredient.UnitMaxLength);
+            entity.Property(ri => ri.Unit)
+                .HasConversion<string>()
+                .HasMaxLength(RecipeIngredient.UnitMaxLength);
+            var units = string.Join(", ", Enum.GetNames<MeasurementUnit>().Select(name => $"'{name}'"));
+            entity.ToTable(t => t.HasCheckConstraint("CK_RecipeIngredients_Unit", $"\"Unit\" IN ({units})"));
 
             entity.HasOne(ri => ri.Recipe)
                 .WithMany(r => r.RecipeIngredients)
