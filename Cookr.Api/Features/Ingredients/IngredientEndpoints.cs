@@ -32,6 +32,7 @@ public static class IngredientEndpoints
         })
             .AddEndpointFilter<ValidationFilter<CreateIngredientRequest>>()
             .WithSummary("Cria ingrediente")
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesValidationProblem();
 
         group.MapPut("/{id:int}", async Task<Results<Ok<IngredientResponse>, ProblemHttpResult>> (
@@ -42,6 +43,7 @@ public static class IngredientEndpoints
         })
             .AddEndpointFilter<ValidationFilter<UpdateIngredientRequest>>()
             .WithSummary("Atualiza ingrediente")
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesValidationProblem();
 
@@ -52,6 +54,7 @@ public static class IngredientEndpoints
             return result.IsSuccess ? TypedResults.NoContent() : result.ToProblem();
         })
             .WithSummary("Remove ingrediente")
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return app;

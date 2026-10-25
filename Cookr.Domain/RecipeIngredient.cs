@@ -2,6 +2,8 @@ namespace Cookr.Domain;
 
 public class RecipeIngredient
 {
+    public const int UnitMaxLength = 20;
+
     public int RecipeId { get; set; }
     public Recipe Recipe { get; set; } = null!;
     public int IngredientId { get; set; }

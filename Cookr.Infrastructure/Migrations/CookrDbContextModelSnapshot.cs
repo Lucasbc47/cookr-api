@@ -24,9 +24,14 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Ingredients");
                 });
@@ -39,6 +44,7 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Instructions")
                         .IsRequired()
+                        .HasMaxLength(4000)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("PrepTimeMinutes")
@@ -49,6 +55,7 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -69,6 +76,7 @@ namespace Cookr.Infrastructure.Migrations
 
                     b.Property<string>("Unit")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("RecipeId", "IngredientId");
@@ -83,7 +91,7 @@ namespace Cookr.Infrastructure.Migrations
                     b.HasOne("Cookr.Domain.Ingredient", "Ingredient")
                         .WithMany("RecipeIngredients")
                         .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Cookr.Domain.Recipe", "Recipe")
