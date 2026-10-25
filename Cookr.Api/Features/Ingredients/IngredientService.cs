@@ -1,4 +1,4 @@
-using Cookr.Domain;
+using Cookr.Api.Shared;
 using Cookr.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,51 +6,59 @@ namespace Cookr.Api.Features.Ingredients;
 
 public interface IIngredientService
 {
-    Task<List<Ingredient>> GetAllAsync();
-    Task<Ingredient?> GetByIdAsync(int id);
-    Task<Ingredient> CreateAsync(Ingredient ingredient);
-    Task<Ingredient?> UpdateAsync(int id, UpdateIngredientRequest request);
-    Task<bool> DeleteAsync(int id);
+    Task<List<IngredientResponse>> GetAllAsync(CancellationToken ct);
+    Task<Result<IngredientResponse>> GetByIdAsync(int id, CancellationToken ct);
+    Task<Result<IngredientResponse>> CreateAsync(CreateIngredientRequest request, CancellationToken ct);
+    Task<Result<IngredientResponse>> UpdateAsync(int id, UpdateIngredientRequest request, CancellationToken ct);
+    Task<Result> DeleteAsync(int id, CancellationToken ct);
 }
 
 public class IngredientService(CookrDbContext dbContext) : IIngredientService
 {
+    private const string NotFoundError = "Ingredient not found";
+
     private readonly CookrDbContext _dbContext = dbContext;
 
-    public async Task<List<Ingredient>> GetAllAsync()
+    public async Task<List<IngredientResponse>> GetAllAsync(CancellationToken ct)
     {
-        return await _dbContext.Ingredients.ToListAsync();
+        return await _dbContext.Ingredients
+            .Select(i => new IngredientResponse(i.Id, i.Name))
+            .ToListAsync(ct);
     }
 
-    public async Task<Ingredient?> GetByIdAsync(int id)
+    public async Task<Result<IngredientResponse>> GetByIdAsync(int id, CancellationToken ct)
     {
-        return await _dbContext.Ingredients.FindAsync(id);
+        var ingredient = await _dbContext.Ingredients.FindAsync([id], ct);
+        return ingredient is not null
+            ? Result<IngredientResponse>.Success(ingredient.ToResponse())
+            : Result<IngredientResponse>.NotFound(NotFoundError);
     }
 
-    public async Task<Ingredient> CreateAsync(Ingredient ingredient)
+    public async Task<Result<IngredientResponse>> CreateAsync(CreateIngredientRequest request, CancellationToken ct)
     {
-        await _dbContext.Ingredients.AddAsync(ingredient);
-        await _dbContext.SaveChangesAsync();
-        return ingredient;
+        var ingredient = request.ToEntity();
+        _dbContext.Ingredients.Add(ingredient);
+        await _dbContext.SaveChangesAsync(ct);
+        return Result<IngredientResponse>.Success(ingredient.ToResponse());
     }
 
-    public async Task<Ingredient?> UpdateAsync(int id, UpdateIngredientRequest request)
+    public async Task<Result<IngredientResponse>> UpdateAsync(int id, UpdateIngredientRequest request, CancellationToken ct)
     {
-        var ingredient = await _dbContext.Ingredients.FindAsync(id);
-        if (ingredient is null) return null;
+        var ingredient = await _dbContext.Ingredients.FindAsync([id], ct);
+        if (ingredient is null) return Result<IngredientResponse>.NotFound(NotFoundError);
 
         request.ApplyTo(ingredient);
-        await _dbContext.SaveChangesAsync();
-        return ingredient;
+        await _dbContext.SaveChangesAsync(ct);
+        return Result<IngredientResponse>.Success(ingredient.ToResponse());
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<Result> DeleteAsync(int id, CancellationToken ct)
     {
-        var ingredient = await _dbContext.Ingredients.FindAsync(id);
-        if (ingredient is null) return false;
+        var ingredient = await _dbContext.Ingredients.FindAsync([id], ct);
+        if (ingredient is null) return Result.NotFound(NotFoundError);
 
         _dbContext.Ingredients.Remove(ingredient);
-        await _dbContext.SaveChangesAsync();
-        return true;
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success();
     }
 }

@@ -12,6 +12,14 @@ public static class RecipeMappings
         Servings = request.Servings
     };
 
+    public static RecipeIngredient ToEntity(this AddRecipeIngredientRequest request, int recipeId) => new()
+    {
+        RecipeId = recipeId,
+        IngredientId = request.IngredientId,
+        Quantity = request.Quantity,
+        Unit = request.Unit
+    };
+
     public static void ApplyTo(this UpdateRecipeRequest request, Recipe recipe)
     {
         recipe.Title = request.Title;
@@ -20,13 +28,6 @@ public static class RecipeMappings
         recipe.Servings = request.Servings;
     }
 
-    public static RecipeIngredient ToEntity(this AddRecipeIngredientRequest request, int recipeId) => new()
-    {
-        RecipeId = recipeId,
-        IngredientId = request.IngredientId,
-        Quantity = request.Quantity,
-        Unit = request.Unit
-    };
     public static RecipeIngredientResponse ToResponse(this RecipeIngredient ri) =>
         new(ri.IngredientId, ri.Ingredient.Name, ri.Quantity, ri.Unit);
 
@@ -38,5 +39,4 @@ public static class RecipeMappings
             recipe.PrepTimeMinutes,
             recipe.Servings,
             recipe.RecipeIngredients.Select(ri => ri.ToResponse()).ToList());
-
 }

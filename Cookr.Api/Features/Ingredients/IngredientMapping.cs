@@ -14,8 +14,5 @@ public static class IngredientMappings
         ingredient.Name = request.Name;
     }
 
-    public static IngredientSummary ToSummary(this Ingredient ingredient) => new(ingredient.Id, ingredient.Name);
-
-    public static IngredientResponse ToResponse(this Ingredient ingredient) =>
-            new(ingredient.Id, ingredient.Name);
+    public static IngredientResponse ToResponse(this Ingredient ingredient) => new(ingredient.Id, ingredient.Name);
 }

@@ -7,10 +7,3 @@ public record RecipeResponse(int Id, string Title, string Instructions, int Prep
 
 public record AddRecipeIngredientRequest(int IngredientId, decimal Quantity, string Unit);
 public record RecipeIngredientResponse(int IngredientId, string Name, decimal Quantity, string Unit);
-public enum AddIngredientResult
-{
-    Success,
-    RecipeNotFound,
-    IngredientNotFound,
-    AlreadyAdded
-}
