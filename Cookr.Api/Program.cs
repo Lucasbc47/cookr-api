@@ -22,6 +22,10 @@ builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy => policy.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
+
 builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -38,6 +42,8 @@ app.UseSerilogRequestLogging(options =>
         : ctx.Request.Path.StartsWithSegments("/swagger") ? LogEventLevel.Verbose
         : LogEventLevel.Information;
 });
+
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
