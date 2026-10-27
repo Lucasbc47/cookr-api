@@ -13,7 +13,7 @@ public class RecipeService(CookrDbContext dbContext)
     public async Task<List<RecipeSummary>> GetAllAsync(CancellationToken ct)
     {
         return await _dbContext.Recipes
-            .Select(r => new RecipeSummary(r.Id, r.Title))
+            .Select(r => new RecipeSummary(r.Id, r.Title, r.PrepTimeMinutes, r.Servings))
             .ToListAsync(ct);
     }
 
