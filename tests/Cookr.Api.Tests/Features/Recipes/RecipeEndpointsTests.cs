@@ -25,6 +25,35 @@ public sealed class RecipeEndpointsTests : IDisposable
     }
 
     [Fact]
+    public async Task GetAll_ExistingRecipe_ReturnsPrepTimeAndServings()
+    {
+        var request = new CreateRecipeRequest("Bolo", "...", 40, 8);
+        await _client.PostAsJsonAsync("/recipes", request);
+
+        var response = await _client.GetAsync("/recipes");
+
+        var recipes = await response.Content.ReadFromJsonAsync<List<RecipeSummary>>();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var summary = Assert.Single(recipes!);
+        Assert.Equal(request.PrepTimeMinutes, summary.PrepTimeMinutes);
+        Assert.Equal(request.Servings, summary.Servings);
+    }
+
+    [Fact]
+    public async Task Post_NumberAsString_ReturnsBadRequest()
+    {
+        var body = new StringContent(
+            """{ "title": "Bolo", "instructions": "...", "prepTimeMinutes": "40", "servings": 8 }""",
+            System.Text.Encoding.UTF8,
+            "application/json");
+
+        var response = await _client.PostAsync("/recipes", body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("bad_request", await CookrApiFactory.ErrorCodeAsync(response));
+    }
+
+    [Fact]
     public async Task Put_RecipeWithIngredients_ReturnsIngredients()
     {
         var recipe = await CreateRecipeAsync();

@@ -7,6 +7,7 @@ public static class JsonConfig
 {
     public static void Apply(JsonSerializerOptions options)
     {
+        options.NumberHandling = JsonNumberHandling.Strict;
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
     }
 }

@@ -5,7 +5,7 @@ namespace Cookr.Api.Features.Recipes;
 
 public record CreateRecipeRequest(string Title, string Instructions, int PrepTimeMinutes, int Servings);
 public record UpdateRecipeRequest(string Title, string Instructions, int PrepTimeMinutes, int Servings);
-public record RecipeSummary(int Id, string Title);
+public record RecipeSummary(int Id, string Title, int PrepTimeMinutes, int Servings);
 public record RecipeResponse(int Id, string Title, string Instructions, int PrepTimeMinutes, int Servings, List<RecipeIngredientResponse> Ingredients);
 
 public record AddRecipeIngredientRequest(int IngredientId, decimal Quantity, MeasurementUnit Unit);
