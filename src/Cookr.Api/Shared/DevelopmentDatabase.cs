@@ -1,4 +1,7 @@
+using System.Globalization;
+using System.Text;
 using Cookr.Api.Features.Recipes;
+using Cookr.Api.Features.Recipes.Covers;
 using Cookr.Domain;
 using Cookr.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -10,14 +13,32 @@ public static class DevelopmentDatabase
     public static async Task MigrateAndSeedAsync(this WebApplication app)
     {
         await using var scope = app.Services.CreateAsyncScope();
-        await scope.ServiceProvider.GetRequiredService<CookrDbContext>().Database.MigrateAsync();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CookrDbContext>();
+        await dbContext.Database.MigrateAsync();
 
         var recipes = scope.ServiceProvider.GetRequiredService<RecipeService>();
+        var covers = scope.ServiceProvider.GetRequiredService<RecipeCoverService>();
+        var coversFolder = Path.Combine(app.Environment.ContentRootPath, "SeedData", "covers");
+
         foreach (var recipe in SampleRecipes)
         {
             await recipes.CreateAsync(recipe, CancellationToken.None);
+
+            var title = recipe.Title.Trim();
+            var saved = await dbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == title);
+            var coverPath = Path.Combine(coversFolder, $"{Slug(title)}.jpg");
+            if (saved.CoverFileName is not null || !File.Exists(coverPath)) continue;
+
+            await using var cover = File.OpenRead(coverPath);
+            await covers.SetAsync(saved.Id, cover, CancellationToken.None);
         }
     }
+
+    private static string Slug(string title) =>
+        string.Concat(title.Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark))
+            .ToLowerInvariant()
+            .Replace(' ', '-');
 
     private static RecipeIngredientInput Item(string name, decimal quantity, MeasurementUnit unit) =>
         new(name, quantity, unit);
@@ -94,18 +115,18 @@ public static class DevelopmentDatabase
                 Item("Folha de louro", 3, MeasurementUnit.Unit)
             ]),
         new(
-            "Moqueca de peixe",
+            "Moqueca de camarão",
             """
-            Tempere o peixe com limão, alho e sal e deixe descansar por 15 minutos.
+            Tempere o camarão com limão, alho e sal e deixe descansar por 15 minutos.
             Numa panela larga, faça camadas de cebola, tomate e pimentão.
-            Coloque o peixe por cima e regue com o leite de coco e o azeite de dendê.
-            Tampe e cozinhe em fogo médio por 20 minutos, sem mexer.
+            Coloque o camarão por cima e regue com o leite de coco e o azeite de dendê.
+            Tampe e cozinhe em fogo médio por 15 minutos, sem mexer.
             Finalize com coentro picado.
             """,
-            50,
+            45,
             4,
             [
-                Item("Peixe em postas", 1, MeasurementUnit.Kilogram),
+                Item("Camarão limpo", 500, MeasurementUnit.Gram),
                 Item("Tomate", 3, MeasurementUnit.Unit),
                 Item("Cebola", 1, MeasurementUnit.Unit),
                 Item("Pimentão", 1, MeasurementUnit.Unit),
