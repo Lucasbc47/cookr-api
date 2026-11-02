@@ -24,7 +24,7 @@ Requer o .NET 10 SDK (versão definida no `global.json`).
 dotnet run --project src/Cookr.Api
 ```
 
-> _Em Development, as migrations são aplicadas sozinhas ao subir a API (`MigrateAndSeedAsync` no `Program.cs`)._
+> _Em Development, as migrations são aplicadas sozinhas ao subir a API e entram 8 receitas de exemplo com foto (`MigrateAndSeedAsync` no `Program.cs`; créditos das fotos em `src/Cookr.Api/SeedData/covers/CREDITS.md`)._
 
 - API: `http://localhost:5021`
 - Scalar: `http://localhost:5021/scalar`
@@ -59,6 +59,7 @@ tests/
   "instructions": "Bata cenoura, ovos e óleo no liquidificador...",
   "prepTimeMinutes": 60,
   "servings": 8,
+  "coverUrl": "/covers/1-6f1c2a9e0b5d4e7f8a3b2c1d0e9f8a7b.webp",
   "ingredients": [
     { "ingredientId": 1, "name": "Cenoura", "quantity": 3, "unit": "unit" },
     {
@@ -76,15 +77,17 @@ tests/
 <details>
 <summary><b>Receitas</b></summary>
 
-| Método   | Rota                                       | Ação                          |
-| -------- | ------------------------------------------ | ----------------------------- |
-| `GET`    | `/recipes`                                 | Lista receitas                |
-| `GET`    | `/recipes/{id}`                            | Receita com ingredientes      |
-| `POST`   | `/recipes`                                 | Cria receita                  |
-| `PUT`    | `/recipes/{id}`                            | Atualiza receita              |
-| `DELETE` | `/recipes/{id}`                            | Remove receita                |
-| `POST`   | `/recipes/{id}/ingredients`                | Adiciona ingrediente          |
-| `DELETE` | `/recipes/{id}/ingredients/{ingredientId}` | Remove ingrediente da receita |
+| Método   | Rota                                       | Ação                                                      |
+| -------- | ------------------------------------------ | --------------------------------------------------------- |
+| `GET`    | `/recipes`                                 | Lista receitas                                            |
+| `GET`    | `/recipes/{id}`                            | Receita com ingredientes                                  |
+| `POST`   | `/recipes`                                 | Cria receita com os ingredientes (409 se o título existe) |
+| `PUT`    | `/recipes/{id}`                            | Atualiza receita e a lista de ingredientes                |
+| `DELETE` | `/recipes/{id}`                            | Remove receita e capa                                     |
+| `POST`   | `/recipes/{id}/ingredients`                | Adiciona ingrediente                                      |
+| `DELETE` | `/recipes/{id}/ingredients/{ingredientId}` | Remove ingrediente da receita                             |
+| `PUT`    | `/recipes/{id}/cover`                      | Envia ou troca a capa (JPEG, PNG ou WebP, até 10 MB)      |
+| `DELETE` | `/recipes/{id}/cover`                      | Remove a capa                                             |
 
 </details>
 
