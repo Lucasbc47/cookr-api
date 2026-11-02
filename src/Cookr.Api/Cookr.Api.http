@@ -15,15 +15,20 @@ Accept: application/json
 GET {{HostAddress}}/recipes/{{RecipeId}}
 Accept: application/json
 
-### POST recipe
+### POST recipe (rodar de novo com o mesmo título retorna 409 recipe_title_taken)
 POST {{HostAddress}}/recipes
 Content-Type: application/json
 
 {
-    "title": "Bolo de cenoura",
-    "instructions": "Bata os ovos, óleo e cenoura no liquidificador. Misture com o restante seco. Asse 40min a 180°C.",
-    "prepTimeMinutes": 60,
-    "servings": 8
+    "title": "Bolo de fubá",
+    "instructions": "Bata tudo no liquidificador. Asse 40 min a 180°C.",
+    "prepTimeMinutes": 50,
+    "servings": 10,
+    "ingredients": [
+        { "name": "Fubá", "quantity": 2, "unit": "cup" },
+        { "name": "Ovo", "quantity": 3, "unit": "unit" },
+        { "name": "Leite", "quantity": 1, "unit": "cup" }
+    ]
 }
 
 ### PUT recipe
@@ -34,7 +39,12 @@ Content-Type: application/json
     "title": "Bolo de cenoura (editado)",
     "instructions": "Bata os ovos, óleo e cenoura no liquidificador. Misture com o restante seco. Asse 40min a 180°C. Cubra com calda de chocolate.",
     "prepTimeMinutes": 75,
-    "servings": 10
+    "servings": 10,
+    "ingredients": [
+        { "name": "Cenoura", "quantity": 3, "unit": "unit" },
+        { "name": "Ovo", "quantity": 3, "unit": "unit" },
+        { "name": "Chocolate em pó", "quantity": 4, "unit": "tablespoon" }
+    ]
 }
 
 ### DELETE recipe
@@ -84,3 +94,17 @@ Content-Type: application/json
 ### DELETE ingredient
 DELETE {{HostAddress}}/ingredients/{{IngredientId}}
 Accept: application/json
+
+### PUT recipe cover (multipart, JPEG/PNG/WebP ate 10 MB)
+PUT {{HostAddress}}/recipes/{{RecipeId}}/cover
+Content-Type: multipart/form-data; boundary=cover
+
+--cover
+Content-Disposition: form-data; name="file"; filename="capa.jpg"
+Content-Type: image/jpeg
+
+< ./capa.jpg
+--cover--
+
+### DELETE recipe cover
+DELETE {{HostAddress}}/recipes/{{RecipeId}}/cover

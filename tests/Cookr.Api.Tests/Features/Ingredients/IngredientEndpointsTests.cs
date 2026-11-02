@@ -37,7 +37,7 @@ public sealed class IngredientEndpointsTests : IDisposable
     [Fact]
     public async Task Put_SameNameDifferentCase_ReturnsOk()
     {
-        var created = await CreateIngredientAsync("Sal");
+        var created = await _client.CreateIngredientAsync("Sal");
 
         var response = await _client.PutAsJsonAsync($"/ingredients/{created.Id}", new UpdateIngredientRequest("SAL"));
 
@@ -47,10 +47,9 @@ public sealed class IngredientEndpointsTests : IDisposable
     [Fact]
     public async Task Delete_IngredientInUse_ReturnsConflict()
     {
-        var ingredient = await CreateIngredientAsync("Farinha");
-        var recipeResponse = await _client.PostAsJsonAsync("/recipes", new CreateRecipeRequest("Pao", "...", 90, 4));
-        var recipe = (await recipeResponse.Content.ReadFromJsonAsync<RecipeResponse>())!;
-        await _client.PostAsJsonAsync($"/recipes/{recipe.Id}/ingredients", new AddRecipeIngredientRequest(ingredient.Id, 500, MeasurementUnit.Gram));
+        var ingredient = await _client.CreateIngredientAsync("Farinha");
+        var recipe = await _client.CreateRecipeAsync("Pao");
+        await _client.AddIngredientAsync(recipe.Id, ingredient.Id, 500, MeasurementUnit.Gram);
 
         var response = await _client.DeleteAsync($"/ingredients/{ingredient.Id}");
 
@@ -61,16 +60,10 @@ public sealed class IngredientEndpointsTests : IDisposable
     [Fact]
     public async Task Delete_UnusedIngredient_ReturnsNoContent()
     {
-        var ingredient = await CreateIngredientAsync("Acucar");
+        var ingredient = await _client.CreateIngredientAsync("Acucar");
 
         var response = await _client.DeleteAsync($"/ingredients/{ingredient.Id}");
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-    }
-
-    private async Task<IngredientResponse> CreateIngredientAsync(string name)
-    {
-        var response = await _client.PostAsJsonAsync("/ingredients", new CreateIngredientRequest(name));
-        return (await response.Content.ReadFromJsonAsync<IngredientResponse>())!;
     }
 }

@@ -13,8 +13,12 @@ public class CookrDbContext(DbContextOptions<CookrDbContext> options) : DbContex
     {
         modelBuilder.Entity<Recipe>(entity =>
         {
-            entity.Property(r => r.Title).HasMaxLength(Recipe.TitleMaxLength);
+            entity.Property(r => r.Title)
+                .HasMaxLength(Recipe.TitleMaxLength)
+                .UseCollation("NOCASE");
+            entity.HasIndex(r => r.Title).IsUnique();
             entity.Property(r => r.Instructions).HasMaxLength(Recipe.InstructionsMaxLength);
+            entity.Property(r => r.CoverFileName).HasMaxLength(Recipe.CoverFileNameMaxLength);
         });
 
         modelBuilder.Entity<Ingredient>(entity =>

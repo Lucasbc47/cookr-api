@@ -15,11 +15,14 @@ public class ValidationFilter<T> : IEndpointFilter
         if (result.IsValid) return await next(context);
 
         var errors = result.Errors
-            .GroupBy(e => JsonNamingPolicy.CamelCase.ConvertName(e.PropertyName))
+            .GroupBy(e => ToJsonPath(e.PropertyName))
             .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
 
         return TypedResults.ValidationProblem(
             errors,
             extensions: new Dictionary<string, object?> { ["code"] = ErrorCodes.ValidationFailed });
     }
+
+    private static string ToJsonPath(string propertyName) =>
+        string.Join('.', propertyName.Split('.').Select(JsonNamingPolicy.CamelCase.ConvertName));
 }

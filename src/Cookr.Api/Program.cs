@@ -2,6 +2,8 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Cookr.Api.Features.Ingredients;
 using Cookr.Api.Features.Recipes;
+using Cookr.Api.Features.Recipes.Covers;
+using Cookr.Api.Features.Recipes.RecipeIngredients;
 using Cookr.Api.Shared;
 using Cookr.Infrastructure;
 using Scalar.AspNetCore;
@@ -19,6 +21,8 @@ builder.Host.UseSerilog((context, config) =>
 builder.Services.AddDbContext<CookrDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("CookrDb")));
 
+builder.Services.AddRecipeCovers(builder.Configuration);
+builder.Services.AddScoped<RecipeIngredientService>();
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<IngredientService>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -46,6 +50,7 @@ app.UseSerilogRequestLogging(options =>
 });
 
 app.UseCors();
+app.UseRecipeCoverFiles();
 
 if (app.Environment.IsDevelopment())
 {
@@ -58,6 +63,8 @@ var version = typeof(Program).Assembly.GetName().Version?.ToString(3);
 app.MapGet("/", () => Results.Ok(new { message = "Cookr is running!", version }));
 
 app.MapRecipeEndpoints();
+app.MapRecipeIngredientEndpoints();
+app.MapRecipeCoverEndpoints();
 app.MapIngredientEndpoints();
 
 await app.RunAsync();

@@ -11,7 +11,7 @@ public class Ingredient
         Rename(name);
     }
 
-#pragma warning disable S1144 // o EF Core usa o setter privado
+#pragma warning disable S1144
     public int Id { get; private set; }
 #pragma warning restore S1144
     public string Name { get; private set; } = string.Empty;

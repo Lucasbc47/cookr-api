@@ -11,10 +11,11 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Cookr.Api.Tests;
 
-// SQLite em memória: o banco vive enquanto a conexão estiver aberta
 internal class CookrApiFactory : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _connection = new("Data Source=:memory:");
+
+    public string CoversPath { get; } = Path.Combine(Path.GetTempPath(), "cookr-tests", Guid.NewGuid().ToString("N"));
 
     public static JsonSerializerOptions Json { get; } = CreateJsonOptions();
 
@@ -34,6 +35,7 @@ internal class CookrApiFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        builder.UseSetting("RecipeCovers:Path", CoversPath);
 
         builder.ConfigureServices(services =>
         {
@@ -51,5 +53,6 @@ internal class CookrApiFactory : WebApplicationFactory<Program>
     {
         base.Dispose(disposing);
         _connection.Dispose();
+        if (Directory.Exists(CoversPath)) Directory.Delete(CoversPath, recursive: true);
     }
 }
