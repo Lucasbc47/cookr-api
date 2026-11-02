@@ -11,6 +11,9 @@
 *.db-shm
 *.db-wal
 
+# Capas enviadas (RecipeCovers:Path)
+src/Cookr.Api/Data/covers/
+
 # Anotações pessoais
 docs/
 

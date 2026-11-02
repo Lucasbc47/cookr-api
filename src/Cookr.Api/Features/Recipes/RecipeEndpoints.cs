@@ -5,9 +5,11 @@ namespace Cookr.Api.Features.Recipes;
 
 public static class RecipeEndpoints
 {
+    public const string Tag = "Recipes";
+
     public static IEndpointRouteBuilder MapRecipeEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/recipes").WithTags("Recipes");
+        var group = app.MapGroup("/recipes").WithTags(Tag);
 
         group.MapGet("/", async (RecipeService service, CancellationToken ct) =>
             TypedResults.Ok(await service.GetAllAsync(ct)))
@@ -22,13 +24,17 @@ public static class RecipeEndpoints
             .WithSummary("Receita completa com ingredientes")
             .ProducesProblem(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", async (CreateRecipeRequest request, RecipeService service, CancellationToken ct) =>
+        group.MapPost("/", async Task<Results<Created<RecipeResponse>, ProblemHttpResult>> (
+            CreateRecipeRequest request, RecipeService service, CancellationToken ct) =>
         {
-            var created = await service.CreateAsync(request, ct);
-            return TypedResults.Created($"/recipes/{created.Id}", created);
+            var result = await service.CreateAsync(request, ct);
+            return result.IsSuccess
+                ? TypedResults.Created($"/recipes/{result.Value.Id}", result.Value)
+                : result.ToProblem();
         })
             .AddEndpointFilter<ValidationFilter<CreateRecipeRequest>>()
-            .WithSummary("Cria receita")
+            .WithSummary("Cria receita com os ingredientes (por nome; cria no catálogo os que não existem)")
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesValidationProblem();
 
         group.MapPut("/{id:int}", async Task<Results<Ok<RecipeResponse>, ProblemHttpResult>> (
@@ -38,8 +44,9 @@ public static class RecipeEndpoints
             return result.IsSuccess ? TypedResults.Ok(result.Value) : result.ToProblem();
         })
             .AddEndpointFilter<ValidationFilter<UpdateRecipeRequest>>()
-            .WithSummary("Atualiza receita")
+            .WithSummary("Atualiza receita e substitui a lista de ingredientes")
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesValidationProblem();
 
         group.MapDelete("/{id:int}", async Task<Results<NoContent, ProblemHttpResult>> (
@@ -49,27 +56,6 @@ public static class RecipeEndpoints
             return result.IsSuccess ? TypedResults.NoContent() : result.ToProblem();
         })
             .WithSummary("Remove receita")
-            .ProducesProblem(StatusCodes.Status404NotFound);
-
-        group.MapPost("/{id:int}/ingredients", async Task<Results<NoContent, ProblemHttpResult>> (
-            int id, AddRecipeIngredientRequest request, RecipeService service, CancellationToken ct) =>
-        {
-            var result = await service.AddIngredientAsync(id, request, ct);
-            return result.IsSuccess ? TypedResults.NoContent() : result.ToProblem();
-        })
-            .AddEndpointFilter<ValidationFilter<AddRecipeIngredientRequest>>()
-            .WithSummary("Vincula ingrediente à receita")
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .ProducesProblem(StatusCodes.Status409Conflict)
-            .ProducesValidationProblem();
-
-        group.MapDelete("/{id:int}/ingredients/{ingredientId:int}", async Task<Results<NoContent, ProblemHttpResult>> (
-            int id, int ingredientId, RecipeService service, CancellationToken ct) =>
-        {
-            var result = await service.RemoveIngredientAsync(id, ingredientId, ct);
-            return result.IsSuccess ? TypedResults.NoContent() : result.ToProblem();
-        })
-            .WithSummary("Desvincula ingrediente da receita")
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return app;

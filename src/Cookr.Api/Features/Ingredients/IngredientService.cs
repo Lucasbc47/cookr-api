@@ -58,7 +58,6 @@ public class IngredientService(CookrDbContext dbContext)
         return Result.Success();
     }
 
-    // Name usa collation NOCASE, então a comparação ignora maiúsculas
     private Task<bool> NameTakenAsync(string name, int? exceptId, CancellationToken ct) =>
         _dbContext.Ingredients.AnyAsync(i => i.Name == name && i.Id != exceptId, ct);
 }

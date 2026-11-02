@@ -1,3 +1,4 @@
+using Cookr.Api.Features.Recipes.Covers;
 using Cookr.Domain;
 
 namespace Cookr.Api.Features.Recipes;
@@ -20,5 +21,6 @@ public static class RecipeMappings
             recipe.Instructions,
             recipe.PrepTimeMinutes,
             recipe.Servings,
+            RecipeCoverStorage.UrlFor(recipe.CoverFileName),
             recipe.RecipeIngredients.Select(ri => ri.ToResponse()).ToList());
 }

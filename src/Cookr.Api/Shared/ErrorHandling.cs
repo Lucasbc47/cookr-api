@@ -10,6 +10,7 @@ public static class ErrorCodes
     public const string BadRequest = "bad_request";
     public const string NotFound = "not_found";
     public const string MethodNotAllowed = "method_not_allowed";
+    public const string PayloadTooLarge = "payload_too_large";
     public const string InternalError = "internal_error";
     public const string Unknown = "error";
 }
@@ -29,6 +30,7 @@ public static class ErrorHandling
                     StatusCodes.Status400BadRequest => ErrorCodes.BadRequest,
                     StatusCodes.Status404NotFound => ErrorCodes.NotFound,
                     StatusCodes.Status405MethodNotAllowed => ErrorCodes.MethodNotAllowed,
+                    StatusCodes.Status413PayloadTooLarge => ErrorCodes.PayloadTooLarge,
                     StatusCodes.Status500InternalServerError => ErrorCodes.InternalError,
                     _ => ErrorCodes.Unknown
                 }));

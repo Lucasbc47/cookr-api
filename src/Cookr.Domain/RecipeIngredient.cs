@@ -13,6 +13,20 @@ public class RecipeIngredient
         Unit = unit;
     }
 
+    internal RecipeIngredient(Ingredient ingredient, decimal quantity, MeasurementUnit unit)
+    {
+        Ingredient = ingredient;
+        IngredientId = ingredient.Id;
+        Quantity = quantity;
+        Unit = unit;
+    }
+
+    internal void Update(decimal quantity, MeasurementUnit unit)
+    {
+        Quantity = quantity;
+        Unit = unit;
+    }
+
 #pragma warning disable S1144
     public int RecipeId { get; private set; }
 #pragma warning restore S1144
