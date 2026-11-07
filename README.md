@@ -1,5 +1,9 @@
 <div align="center">
 
+![Cookr API: resposta JSON de GET /recipes/21 e a foto de capa da receita](.github/cover.jpg)
+
+<sub>Foto: Pedro Toniazzo Terres, CC BY-SA 4.0, via Wikimedia Commons. Créditos de todas as fotos em <a href="src/Cookr.Api/SeedData/covers/CREDITS.md">CREDITS.md</a>.</sub>
+
 # Cookr API
 
 **API REST do Cookr, um app de receitas pessoais.**
